@@ -53,7 +53,7 @@ public:
         // O_rw
         Vector3f O_rw = center;
         // d_rc
-        Vector3f d_rc = Vector3f((point.x() - center.x()) / fx, (center().y() - point().y()) / fy, 1).normalized();
+        Vector3f d_rc = Vector3f((point.x() - center.x()) / fx, (center.y() - point.y()) / fy, 1).normalized();
 
         // d_rw
         Vector3f d_rw = R * d_rc;
