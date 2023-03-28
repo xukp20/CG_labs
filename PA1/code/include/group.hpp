@@ -31,7 +31,7 @@ public:
     bool intersect(const Ray &r, Hit &h, float tmin) override {
         bool isIntersect = false;
         for (int i = 0; i < group_size; i++) {
-            if (objects[i]->intersect(r, h, tmin)) {
+            if (objects[i] && objects[i]->intersect(r, h, tmin)) {
                 isIntersect = true;
             }
         }

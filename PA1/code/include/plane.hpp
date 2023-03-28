@@ -29,11 +29,11 @@ public:
         
         // if parallel, no intersection
         float n_dot_rd = Vector3f::dot(_n, r.getDirection());
-        if (n_dot_rd < 1e-6) {
+        if (fabs(n_dot_rd) < 1e-6) {
             return false;
         }
 
-        float t = - (_d + Vector3f::dot(_n, r.getOrigin())) / n_dot_rd;
+        float t = (_d - Vector3f::dot(_n, r.getOrigin())) / n_dot_rd;
         if (t < tmin || t <= 0) {
             return false;
         }
