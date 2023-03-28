@@ -29,7 +29,7 @@ public:
         
         // if parallel, no intersection
         float n_dot_rd = Vector3f::dot(_n, r.getDirection());
-        if (n_dot_rd == 0) {
+        if (n_dot_rd < 1e-6) {
             return false;
         }
 

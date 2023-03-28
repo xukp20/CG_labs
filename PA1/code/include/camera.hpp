@@ -46,6 +46,8 @@ public:
         // angle is in radian.
         fx = width / (2 * tan(angle / 2));
         fy = height / (2 * tan(angle / 2));
+        cx = width / 2;
+        cy = height / 2;
         R = Matrix3f(horizontal, -up, direction, true);
     }
 
@@ -53,7 +55,7 @@ public:
         // O_rw
         Vector3f O_rw = center;
         // d_rc
-        Vector3f d_rc = Vector3f((point.x() - center.x()) / fx, (center.y() - point.y()) / fy, 1).normalized();
+        Vector3f d_rc = Vector3f((point.x() - cx) / fx, (cy - point.y()) / fy, 1).normalized();
 
         // d_rw
         Vector3f d_rw = R * d_rc;
@@ -64,6 +66,7 @@ public:
 private:
     float fx;
     float fy;
+    float cx, cy;
     Matrix3f R;
 };
 

@@ -30,6 +30,9 @@ public:
 
 		Vector3f result = Vector3f::ZERO;
 		float under = det(ray.getDirection(), e1, e2);
+		if (under < 1e-6) {
+			return false;
+		}
 		result[0] = det(s, e1, e2) / under;
 		result[1] = det(ray.getDirection(), s, e2) / under;
 		result[2] = det(ray.getDirection(), e1, s) / under;
