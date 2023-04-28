@@ -69,10 +69,80 @@ public:
     void discretize(int resolution, std::vector<CurvePoint>& data) override {
         data.clear();
         // TODO (PA2): fill in data vector
+        unsigned int n = controls.size() - 1;
+        unsigned int k = n;
+
+        // all the ti 
+        this->knots = std::vector<float>(n + k + 1, 0);
+        for (int i = 0; i < n + k + 1; i++) {
+            knots[i] = (float)i / (n + k + 1);
+        }
+
+        // step 
+        float step = 1.0f / resolution / (n + k + 1);
+
+        // recursion memoization
+        this->B = std::vector<std::vector<float>>(n + k + 1, std::vector<float>(k + 1, 0));
+        // bitmap 
+        this->bitmap = std::vector<std::vector<bool>>(n + k + 1, std::vector<bool>(k + 1, false));
+
+        // go through all the ti
+        for (int i = 0; i < n + k + 1; i++) {
+            // divide into resolution parts
+            for (int j = 0; j < resolution; j++) {
+                float tij = knots[i] + j * step;
+                Vector3f point(0, 0, 0);
+                Vector3f tangent(0, 0, 0);
+                
+                // clear bitmap
+                for (int a = 0; a < n + k + 1; a++) {
+                    for (int b = 0; b < k + 1; b++) {
+                        this->bitmap[a][b] = false;
+                    }
+                }
+                
+                // recursion: compute all Bik
+                for (int a = 0; a < n + 1; a++) {
+                    Vector3f control = this->controls[a];
+                    float Bik = compute_B(a, k, tij);
+                    point += control * Bik;
+                    tangent += control * k * (compute_B(a, k - 1, tij)/(knots[a + k] - knots[a]) - compute_B(a + 1, k - 1, tij)/(knots[a + k + 1] - knots[a + 1]));
+                }
+
+                CurvePoint cp;
+                cp.V = point;
+                cp.T = tangent.normalized();
+                data.push_back(cp);
+            }
+        }
+    }
+
+    float compute_B(unsigned int i, unsigned int k, float t){
+        if (k == 0) {
+            if (t >= this->knots[i] && t < this->knots[i + 1]) {
+                return 1;
+            } else {
+                return 0;
+            }
+            
+        }
+
+        if (this->bitmap[i][k]) {
+            return this->B[i][k];
+        }
+
+        float B1 = compute_B(i, k - 1, t);
+        float B2 = compute_B(i + 1, k - 1, t);
+        float B = B1 * (t - this->knots[i]) / (this->knots[i + k] - this->knots[i]) + B2 * (this->knots[i + k + 1] - t) / (this->knots[i + k + 1] - this->knots[i + 1]);
+        this->B[i][k] = B;
+        this->bitmap[i][k] = true;
+        return B;
     }
 
 protected:
-
+    std::vector<float> knots;
+    std::vector<std::vector<float>> B;
+    std::vector<std::vector<bool>> bitmap;
 };
 
 class BsplineCurve : public Curve {
@@ -87,10 +157,80 @@ public:
     void discretize(int resolution, std::vector<CurvePoint>& data) override {
         data.clear();
         // TODO (PA2): fill in data vector
+        unsigned int n = controls.size() - 1;
+        unsigned int k = 3;
+
+        // all the ti 
+        this->knots = std::vector<float>(n + k + 1, 0);
+        for (int i = 0; i < n + k + 1; i++) {
+            knots[i] = (float)i / (n + k + 1);
+        }
+
+        // step 
+        float step = 1.0f / resolution / (n + k + 1);
+
+        // recursion memoization
+        this->B = std::vector<std::vector<float>>(n + k + 1, std::vector<float>(k + 1, 0));
+        // bitmap 
+        this->bitmap = std::vector<std::vector<bool>>(n + k + 1, std::vector<bool>(k + 1, false));
+
+        // go through valid t
+        for (int i = k; i < n + 1; i++) {
+            // divide into resolution parts
+            for (int j = 0; j < resolution; j++) {
+                float tij = knots[i] + j * step;
+                Vector3f point(0, 0, 0);
+                Vector3f tangent(0, 0, 0);
+                
+                // clear bitmap
+                for (int a = 0; a < n + k + 1; a++) {
+                    for (int b = 0; b < k + 1; b++) {
+                        this->bitmap[a][b] = false;
+                    }
+                }
+                
+                // recursion: compute all Bik
+                for (int a = 0; a < n + 1; a++) {
+                    Vector3f control = this->controls[a];
+                    float Bik = compute_B(a, k, tij);
+                    point += control * Bik;
+                    tangent += control * k * (compute_B(a, k - 1, tij)/(knots[a + k] - knots[a]) - compute_B(a + 1, k - 1, tij)/(knots[a + k + 1] - knots[a + 1]));
+                }
+
+                CurvePoint cp;
+                cp.V = point;
+                cp.T = tangent.normalized();
+                data.push_back(cp);
+            }
+        }
+    }
+
+    float compute_B(unsigned int i, unsigned int k, float t){
+        if (k == 0) {
+            if (t >= this->knots[i] && t < this->knots[i + 1]) {
+                return 1;
+            } else {
+                return 0;
+            }
+            
+        }
+
+        if (this->bitmap[i][k]) {
+            return this->B[i][k];
+        }
+
+        float B1 = compute_B(i, k - 1, t);
+        float B2 = compute_B(i + 1, k - 1, t);
+        float B = B1 * (t - this->knots[i]) / (this->knots[i + k] - this->knots[i]) + B2 * (this->knots[i + k + 1] - t) / (this->knots[i + k + 1] - this->knots[i + 1]);
+        this->B[i][k] = B;
+        this->bitmap[i][k] = true;
+        return B;
     }
 
 protected:
-
+    std::vector<float> knots;
+    std::vector<std::vector<float>> B;
+    std::vector<std::vector<bool>> bitmap;
 };
 
 #endif // CURVE_HPP

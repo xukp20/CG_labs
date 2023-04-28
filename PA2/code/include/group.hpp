@@ -40,7 +40,8 @@ public:
 
     void drawGL() override {
         for (auto *obj : objects) {
-            obj->drawGL();
+            if (obj)
+                obj->drawGL();
         }
     }
 
