@@ -74,7 +74,7 @@ public:
 
         // all the ti 
         this->knots = std::vector<float>(n + k + 1, 0);
-        for (int i = 0; i < n + k + 1; i++) {
+        for (int i = 0; i <= n + k + 1; i++) {
             knots[i] = (float)i / (n + k + 1);
         }
 
@@ -82,9 +82,9 @@ public:
         float step = 1.0f / resolution / (n + k + 1);
 
         // recursion memoization
-        this->B = std::vector<std::vector<float>>(n + k + 1, std::vector<float>(k + 1, 0));
+        this->B = std::vector<std::vector<float>>(n + 1, std::vector<float>(k + 1, 0));
         // bitmap 
-        this->bitmap = std::vector<std::vector<bool>>(n + k + 1, std::vector<bool>(k + 1, false));
+        this->bitmap = std::vector<std::vector<bool>>(n + 1, std::vector<bool>(k + 1, false));
 
         // go through all the ti
         for (int i = 0; i < n + k + 1; i++) {
@@ -95,7 +95,7 @@ public:
                 Vector3f tangent(0, 0, 0);
                 
                 // clear bitmap
-                for (int a = 0; a < n + k + 1; a++) {
+                for (int a = 0; a < n + 1; a++) {
                     for (int b = 0; b < k + 1; b++) {
                         this->bitmap[a][b] = false;
                     }
@@ -106,7 +106,13 @@ public:
                     Vector3f control = this->controls[a];
                     float Bik = compute_B(a, k, tij);
                     point += control * Bik;
-                    tangent += control * k * (compute_B(a, k - 1, tij)/(knots[a + k] - knots[a]) - compute_B(a + 1, k - 1, tij)/(knots[a + k + 1] - knots[a + 1]));
+                }           
+
+                // compute tangent
+                for (int a = 0; a < n; a++) {
+                    Vector3f control = this->controls[a + 1] - this->controls[a];
+                    float Bik = compute_B(a, k - 1, tij);
+                    tangent += control * Bik * k;
                 }
 
                 CurvePoint cp;
@@ -118,13 +124,11 @@ public:
     }
 
     float compute_B(unsigned int i, unsigned int k, float t){
-        if (k == 0) {
-            if (t >= this->knots[i] && t < this->knots[i + 1]) {
-                return 1;
-            } else {
-                return 0;
-            }
-            
+        if (i == 0) {
+            return pow(1 - t, k);
+        } 
+        if (i == k) {
+            return pow(t, k);
         }
 
         if (this->bitmap[i][k]) {
@@ -132,11 +136,25 @@ public:
         }
 
         float B1 = compute_B(i, k - 1, t);
-        float B2 = compute_B(i + 1, k - 1, t);
-        float B = B1 * (t - this->knots[i]) / (this->knots[i + k] - this->knots[i]) + B2 * (this->knots[i + k + 1] - t) / (this->knots[i + k + 1] - this->knots[i + 1]);
-        this->B[i][k] = B;
+        float B2 = compute_B(i - 1, k - 1, t);
+        float B = B1 * (1 - t) + B2 * t;
+
         this->bitmap[i][k] = true;
+        this->B[i][k] = B;
+
         return B;
+    }
+
+    int C(int n, int k) {
+        // compute Cnk
+        int result = 1;
+        for (int i = 1; i <= k; i++) {
+            result *= (n - i + 1);
+        }
+        for (int i = 1; i <= k; i++) {
+            result /= i;
+        }
+        return result;
     }
 
 protected:
