@@ -173,7 +173,7 @@ for epoch in range(opt.n_epochs):
         d_real_loss = adversarial_loss(validity_real, valid)
 
         validity_fake = discriminator(gen_imgs.stop_grad(), gen_labels)
-        d_fake_loss = adversarial_loss(validity_fake, valid)
+        d_fake_loss = adversarial_loss(validity_fake, fake)
 
         # 总的判别器损失
         d_loss = (d_real_loss + d_fake_loss) / 2
@@ -198,7 +198,7 @@ discriminator.eval()
 generator.load('generator_last.pkl')
 discriminator.load('discriminator_last.pkl')
 
-number = 13710431369909
+number = "13710431369909"
 n_row = len(number)
 z = jt.array(np.random.normal(0, 1, (n_row, opt.latent_dim))).float32().stop_grad()
 labels = jt.array(np.array([int(number[num]) for num in range(n_row)])).float32().stop_grad()
