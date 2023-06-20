@@ -32,7 +32,7 @@ public:
     // attributes
     int width, height;  // width and height of the image
 
-    PathTracing(SceneParser *scene, std::string output_file, int rounds=100, int max_depth=20) : Renderer(scene, output_file) {
+    PathTracing(SceneParser *scene, std::string output_file, int rounds=50, int max_depth=20) : Renderer(scene, output_file) {
         camera = scene->getCamera();
         group = scene->getGroup();
         width = camera->getWidth();
@@ -68,6 +68,12 @@ public:
             // printf("i: %d\n", i);
             float ratio = (float)(1 + i) / width;
             fprintf(stderr, "\rProgress: %.2f%%", ratio * 100);
+            // approximate time
+            end = time(NULL);
+            float time = (float)(end - start) / 60;
+            float time_left = time / ratio - time;
+            fprintf(stderr, ", Time elapsed: %.2fmin", time);
+            fprintf(stderr, ", Time left: %.2fmin", time_left);
             for (int j = 0; j < height; j++) {
                 Vector3f color = Vector3f::ZERO;
                 for (int k = 0; k < rounds; k++) {
@@ -80,6 +86,7 @@ public:
                 image->SetPixel(i, j, color);
             }
         }
+        printf("\n");
     }
     
 

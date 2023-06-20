@@ -7,6 +7,7 @@ ENDIF()
 
 SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g2 -ggdb -fopenmp")
 SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall -fopenmp")
+SET(CMAKE_BUILD_TYPE Release)
 
 ADD_SUBDIRECTORY(deps/vecmath)
 
