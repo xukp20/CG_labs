@@ -30,7 +30,9 @@ Materials {
     Material { diffuseColor 0 0 1 }
     Material { diffuseColor 1 1 1 
 	specularColor 1 1 1
-	shininess 20}
+	shininess 20
+    ratio 1 1 0
+    }
 }
 
 Group {
