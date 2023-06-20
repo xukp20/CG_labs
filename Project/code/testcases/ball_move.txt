@@ -18,7 +18,7 @@ Materials {
 	  color 1 1 1
 	  specularColor 1 1 1
 	  shininess 20
-      type 0 0 1
+      type 0 1 0
       refr 2
 	}
     Material { 
@@ -48,9 +48,12 @@ Materials {
 Group {
     numObjects 10
     MaterialIndex 0
-    Sphere {
+    MovingSphere {
         center 0 0.5 1
         radius 0.5
+        center2 0 0.5 1.2
+        t0 0
+        t1 1
     }
     MaterialIndex 1
     Plane {

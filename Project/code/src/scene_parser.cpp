@@ -11,6 +11,7 @@
 #include "group.hpp"
 #include "mesh.hpp"
 #include "sphere.hpp"
+#include "moving_sphere.hpp"
 #include "plane.hpp"
 #include "triangle.hpp"
 #include "transform.hpp"
@@ -282,6 +283,8 @@ Object3D *SceneParser::parseObject(char token[MAX_PARSER_TOKEN_LENGTH]) {
         answer = (Object3D *) parseGroup();
     } else if (!strcmp(token, "Sphere")) {
         answer = (Object3D *) parseSphere();
+    } else if (!strcmp(token, "MovingSphere")) {
+        answer = (Object3D *) parseMovingSphere();
     } else if (!strcmp(token, "Plane")) {
         answer = (Object3D *) parsePlane();
     } else if (!strcmp(token, "Triangle")) {
@@ -363,6 +366,30 @@ Sphere *SceneParser::parseSphere() {
     return new Sphere(center, radius, current_material);
 }
 
+MovingSphere *SceneParser::parseMovingSphere() {
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    getToken(token);
+    assert (!strcmp(token, "{"));
+    getToken(token);
+    assert (!strcmp(token, "center"));
+    Vector3f center = readVector3f();
+    getToken(token);
+    assert (!strcmp(token, "radius"));
+    float radius = readFloat();
+    getToken(token);
+    assert (!strcmp(token, "center2"));
+    Vector3f center2 = readVector3f();
+    getToken(token);
+    assert (!strcmp(token, "t0"));
+    float t0 = readFloat();
+    getToken(token);
+    assert (!strcmp(token, "t1"));
+    float t1 = readFloat();
+    getToken(token);
+    assert (!strcmp(token, "}"));
+    assert (current_material != nullptr);
+    return new MovingSphere(center, radius, current_material, center2, t0, t1);
+}
 
 Plane *SceneParser::parsePlane() {
     char token[MAX_PARSER_TOKEN_LENGTH];

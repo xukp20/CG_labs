@@ -85,42 +85,87 @@ public:
         }
     }
 
-    bool scatter(const Ray &ray, const Hit &hit, Vector3f &attenuation, Ray &scattered, float old_n) {
+    bool scatter(const Ray &ray, const Hit &hit, Vector3f &attenuation, Ray &scattered, bool front=true) {
         // get a rand threshold to determine the type of scattering
         float rand = rand_thres();
-        scattered.time = ray.time;
         if (rand < ratio.getDiffuseThres()) {
             // diffuse
+            // printf("diffuse\n");
             Vector3f target = hit.getNormal() + random_unit_vector();
-            scattered = Ray(ray.pointAtParameter(hit.getT()), target.normalized());
+            scattered = Ray(ray.pointAtParameter(hit.getT()), target.normalized(), ray.time);
             attenuation = diffuseColor;
             return true;
         } else if (rand < ratio.getSpecularThres()) {
             // specular
-            Vector3f reflected = reflect(ray.getDirection().normalized(), hit.getNormal());
-            scattered = Ray(ray.pointAtParameter(hit.getT()), reflected);
+            // printf("specular\n");
+            Vector3f reflected = reflect(ray.getDirection().normalized(), hit.getNormal()).normalized();
+            scattered = Ray(ray.pointAtParameter(hit.getT()), reflected, ray.time);
             attenuation = specularColor;
             return Vector3f::dot(scattered.getDirection(), hit.getNormal()) > 0;
         } else {
             // refract
             attenuation = Vector3f(1, 1, 1);
 
-            Vector3f N = hit.getNormal();
-            Vector3f V = ray.getDirection().normalized();
-            float cos_theta = Vector3f::dot(-V, N);
-            float sin_theta = sqrt(1 - cos_theta * cos_theta);
-            float n_ratio = old_n / n;
-            // check if total internal reflection
-            if (n_ratio * sin_theta > 1) {
-                Vector3f reflected = reflect(V, N);
-                scattered = Ray(ray.pointAtParameter(hit.getT()), reflected);
-                return true;
+            // Vector3f N = hit.getNormal();
+            // Vector3f V = ray.getDirection().normalized();
+            // float cos_theta = Vector3f::dot(-V, N);
+            // float sin_theta = sqrt(1 - cos_theta * cos_theta);
+            // float n_ratio = old_n / n;
+            // // check if total internal reflection
+            // if (n_ratio * sin_theta > 1) {
+            //     Vector3f reflected = reflect(V, N);
+            //     scattered = Ray(ray.pointAtParameter(hit.getT()), reflected);
+            //     return true;
+            // }
+
+            // // refract
+            // float cos_phi = sqrt(1 - n_ratio * n_ratio * (1 - cos_theta * cos_theta));
+            // Vector3f refracted = n_ratio * (V + cos_theta * N) - cos_phi * N;
+            // scattered = Ray(ray.pointAtParameter(hit.getT()), refracted);
+            // return true;
+
+
+            // float R0 = pow((1 - n) / (1 + n), 2);
+            double refraction_ratio = front ? (1.0 / n) : n;
+
+            Vector3f unit_direction = ray.getDirection().normalized();
+            Vector3f norm = front ? hit.getNormal() : -hit.getNormal();
+            float cos_theta = fmin(Vector3f::dot(-unit_direction, hit.getNormal()), 1.0);
+            float cos2 = 1 - refraction_ratio * refraction_ratio * (1 - cos_theta * cos_theta);
+            bool full_reflection = cos2 < 0;
+            Vector3f direction;
+
+            if (full_reflection) {
+                direction = reflect(unit_direction, norm);
+            } else {
+                // float R = R0 + (1 - R0) * pow(1 - cos_theta, 5);
+                // if (rand_thres() < R) {
+                    // direction = reflect(unit_direction, norm);
+                // } else {
+                    // printf("refract\n");
+                    // Vector3f r_out_prep = refraction_ratio * (unit_direction + cos_theta * hit.getNormal());
+                    direction = (refraction_ratio * (unit_direction + cos_theta * norm) - sqrt(cos2) * norm).normalized();
+                // }
+
+                // printf("refract\n");
+                // printf("t: %f\n", hit.getT());
+                // printf("normal: %f %f %f\n", hit.getNormal().x(), hit.getNormal().y(), hit.getNormal().z());
+                // printf("old direction: %f %f %f\n", unit_direction.x(), unit_direction.y(), unit_direction.z());
+                // printf("new direction: %f %f %f\n", direction.x(), direction.y(), direction.z());
+                // printf("front: %d\n", front);
+                // if(front) {
+                //     printf("go in\n");
+                // } else {
+                //     printf("go out\n");
+                // }
+                // printf("old cos: %f\n", cos_theta);
+                // printf("new cos: %f\n", Vector3f::dot(-direction, hit.getNormal()));
             }
 
-            // refract
-            float cos_phi = sqrt(1 - n_ratio * n_ratio * (1 - cos_theta * cos_theta));
-            Vector3f refracted = n_ratio * (V + cos_theta * N) - cos_phi * N;
-            scattered = Ray(ray.pointAtParameter(hit.getT()), refracted);
+            scattered = Ray(ray.pointAtParameter(hit.getT()), direction, ray.time);
+
+            // scattered = Ray(ray.pointAtParameter(hit.getT()), ray.getDirection());
+            // printf("refract\n");
             return true;
         }
     }

@@ -41,8 +41,8 @@ public:
 			return false;
 		} else {
 			// the direction is opposite to the ray direction?
-			Vector3f n = Vector3f::dot(normal, ray.getDirection()) < 0 ? normal : -normal;
-			hit.set(result[0], material, n);
+			// Vector3f n = Vector3f::dot(normal, ray.getDirection()) < 0 ? normal : -normal;
+			hit.set(result[0], material, normal);
 			return true;
 		}
 	}

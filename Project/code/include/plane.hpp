@@ -39,8 +39,8 @@ public:
         }
 
         if (t <= h.getT()) {
-            Vector3f normal = Vector3f::dot(_n, r.getDirection()) < 0 ? _n : -_n;
-            h.set(t, material, normal);
+            // Vector3f normal = Vector3f::dot(_n, r.getDirection()) < 0 ? _n : -_n;
+            h.set(t, material, _n);
             return true;
         }
         return false;

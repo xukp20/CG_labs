@@ -14,6 +14,7 @@ class Plane;
 class Triangle;
 class Transform;
 class Mesh;
+class MovingSphere;
 
 #define MAX_PARSER_TOKEN_LENGTH 1024
 
@@ -68,6 +69,7 @@ private:
     Object3D *parseObject(char token[MAX_PARSER_TOKEN_LENGTH]);
     Group *parseGroup();
     Sphere *parseSphere();
+    MovingSphere *parseMovingSphere();
     Plane *parsePlane();
     Triangle *parseTriangle();
     Mesh *parseTriangleMesh();
