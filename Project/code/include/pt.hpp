@@ -118,41 +118,67 @@ public:
     // traceRay: trace a ray for once
     Vector3f traceRay(Ray ray, int depth) {
         Hit hit;
-        if (depth >= max_depth) {
-            // reach the max depth
-            // printf("diffRatio: (%f, %f, %f)\n", diffRatio.x(), diffRatio.y(), diffRatio.z());
-            // printf("color: (%f, %f, %f)\n", color.x(), color.y(), color.z());
-            return Vector3f::ZERO;
-        }
-
-        if (group->intersect(ray, hit, 0.001)) {
-            // hit
-            // move the ray
-            Ray scattered(Vector3f::ZERO, Vector3f::ZERO);
-            Vector3f attenuation;
-            // check if entering the object
-            // note: the normal is always pointing outwards
-            bool front = Vector3f::dot(ray.getDirection(), hit.getNormal()) < 0;
-            // printf("T: %f\n", hit.getT());
-            // printf("hit point: (%f, %f, %f)\n", ray.pointAtParameter(hit.getT()).x(), ray.pointAtParameter(hit.getT()).y(), ray.pointAtParameter(hit.getT()).z());
-            if (hit.getMaterial()->scatter(ray, hit, attenuation, scattered, front)) {
-                // printf("attenuation: (%f, %f, %f)\n", attenuation.x(), attenuation.y(), attenuation.z());
-                // printf("selfColor: (%f, %f, %f)\n", hit.getMaterial()->selfColor.x(), hit.getMaterial()->selfColor.y(), hit.getMaterial()->selfColor.z());
-
-                Vector3f color = hit.getMaterial()->selfColor + attenuation * traceRay(scattered, depth + 1);
-                // printf("depth: %d\n", depth);
-                // printf("attenuation: (%f, %f, %f)\n", attenuation.x(), attenuation.y(), attenuation.z());
-                // printf("selfColor: (%f, %f, %f)\n", hit.getMaterial()->selfColor.x(), hit.getMaterial()->selfColor.y(), hit.getMaterial()->selfColor.z());
-                // printf("color: (%f, %f, %f)\n", color.x(), color.y(), color.z());
-                fflush(stdout);
-                return color;
-            } else {
-                return Vector3f::ZERO;
+        Vector3f color = Vector3f::ZERO;
+        Vector3f cf = Vector3f(1.0, 1.0, 1.0);
+        
+        while(true) {
+            if (++depth > max_depth) {
+                break;
             }
-        } else {
-            // no hit
-            return scene->getBackgroundColor();
+            if (group->intersect(ray, hit, 0.001)) {
+                // hit
+                // move the ray
+                Ray scattered(Vector3f::ZERO, Vector3f::ZERO);
+                Vector3f attenuation;
+                // check if entering the object
+                // note: the normal is always pointing outwards
+                bool front = Vector3f::dot(ray.getDirection(), hit.getNormal()) < 0;
+                // printf("T: %f\n", hit.getT());
+                // printf("hit point: (%f, %f, %f)\n", ray.pointAtParameter(hit.getT()).x(), ray.pointAtParameter(hit.getT()).y(), ray.pointAtParameter(hit.getT()).z());
+                if (hit.getMaterial()->scatter(ray, hit, attenuation, scattered, front)) {
+                    // Vector3f color = hit.getMaterial()->selfColor + attenuation * traceRay(scattered, depth + 1);
+
+                    color += cf * hit.getMaterial()->selfColor;
+                    ray = scattered;
+                    cf = cf * attenuation;
+                } else {
+                    break;
+                }
+            } else {
+                // no hit
+                color = color + cf * scene->getBackgroundColor();
+                break;
+            }
         }
+        return color;
+
+        // if (depth > max_depth) {
+        //     return Vector3f::ZERO;
+        // }
+
+        // if (group->intersect(ray, hit, 0.001)) {
+        //     // hit
+        //     // move the ray
+        //     Ray scattered(Vector3f::ZERO, Vector3f::ZERO);
+        //     Vector3f attenuation;
+        //     // check if entering the object
+        //     // note: the normal is always pointing outwards
+        //     bool front = Vector3f::dot(ray.getDirection(), hit.getNormal()) < 0;
+        //     // printf("T: %f\n", hit.getT());
+        //     // printf("hit point: (%f, %f, %f)\n", ray.pointAtParameter(hit.getT()).x(), ray.pointAtParameter(hit.getT()).y(), ray.pointAtParameter(hit.getT()).z());
+        //     if (hit.getMaterial()->scatter(ray, hit, attenuation, scattered, front)) {
+        //         // printf("attenuation: (%f, %f, %f)\n", attenuation.x(), attenuation.y(), attenuation.z());
+        //         // printf("selfColor: (%f, %f, %f)\n", hit.getMaterial()->selfColor.x(), hit.getMaterial()->selfColor.y(), hit.getMaterial()->selfColor.z());
+
+        //         Vector3f color = hit.getMaterial()->selfColor + attenuation * traceRay(scattered, depth + 1);
+        //         return color;
+        //     } else {
+        //         return Vector3f::ZERO;
+        //     }
+        // } else {
+        //     // no hit
+        //     return scene->getBackgroundColor();
+        // }
     }
 
     // utils

@@ -51,7 +51,7 @@ Group {
     MovingSphere {
         center 0 0.5 1
         radius 0.5
-        center2 0 0.5 1.2
+        center2 0 0.7 1
         t0 0
         t1 1
     }
