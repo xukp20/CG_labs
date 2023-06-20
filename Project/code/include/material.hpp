@@ -88,6 +88,7 @@ public:
     bool scatter(const Ray &ray, const Hit &hit, Vector3f &attenuation, Ray &scattered, float old_n) {
         // get a rand threshold to determine the type of scattering
         float rand = rand_thres();
+        scattered.time = ray.time;
         if (rand < ratio.getDiffuseThres()) {
             // diffuse
             Vector3f target = hit.getNormal() + random_unit_vector();

@@ -38,6 +38,7 @@ SET(PROJECT_INCLUDES
         # include/sppm/kdtree.hpp
         # include/sppm/hitpoint.hpp
         include/pt.hpp
+        include/pt_thread.hpp
         )
 
 SET(CMAKE_CXX_STANDARD 11)

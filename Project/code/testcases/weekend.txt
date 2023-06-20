@@ -1,0 +1,51 @@
+PerspectiveCamera {
+    center 13 2 3
+    direction -13 -2 -3
+    up 0 1 0
+    angle 30
+    width 800
+    height 800
+}
+
+Background {
+    color 0.1 0.2 0.7
+}
+
+Materials {
+    numMaterials 6
+    Material { 
+	    color 0.5 0.5 0.5 
+        type 1 0 0
+	}
+    Material { 
+        color 0.7 0.7 0.7 
+        emission 0 0 0
+        type 1 0 0
+    }
+    Material { 
+        color 0.8 0.8 0.8
+        type 1 0 0
+        emission 2 2 2
+    }
+    Material { 
+        color 0.75 0.25 0.25 
+        type 1 0 0
+    }
+    Material { 
+        color 0.25 0.75 0.25 
+        type 1 0 0
+    }
+    Material { 
+        color 0.25 0.25 0.75 
+        type 1 0 0
+    }
+}
+
+Group {
+    numObjects 1
+    MaterialIndex 0
+    Sphere {
+        center 0 -1000 0
+        radius 1000
+    }
+}
