@@ -61,8 +61,8 @@ public:
         this->time0 = time0;
         this->time1 = time1;
 
-        printf("fx: %f, fy: %f, cx: %f, cy: %f\n", fx, fy, cx, cy);
-        printf("aperture: %f, f: %f\n", aperture, f);
+        printf("Camera fx: %f, fy: %f, cx: %f, cy: %f\n", fx, fy, cx, cy);
+        printf("Camera aperture: %f, f: %f\n", aperture, f);
     }
 
     // don't take focal and aperture into account

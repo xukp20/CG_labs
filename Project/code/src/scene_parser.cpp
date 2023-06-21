@@ -127,7 +127,7 @@ void SceneParser::parsePerspectiveCamera() {
     assert (!strcmp(token, "height"));
     int height = readInt();
     getToken(token);
-    float focalLength = 20, apertureSize = 0.2, time0 = 0, time1 = 1;
+    float focalLength = 20, apertureSize = 0.0, time0 = 0, time1 = 1;
     if (!strcmp(token, "focalLength")) {
         focalLength = readFloat();
         getToken(token);

@@ -34,6 +34,10 @@ public:
     // lower bound and upper bound for parameter phi
     virtual float lowerBound() = 0;
     virtual float upperBound() = 0;
+
+    bool bounding_box(double time0, double time1, AABB &output_box) override {
+        return false;
+    }
 };
 
 class BezierCurve : public Curve {
@@ -56,13 +60,19 @@ public:
     }
 
     CurvePoint getPoint(float phi) {
+        // printf("get point %f\n", phi);
         CurvePoint point;
         point.V = Vector3f(0, 0, 0);
         point.T = Vector3f(0, 0, 0);
         for (int i = 0; i <= n; i++) {
+            // printf("i = %d\n", i);
+            // printf("B(i, k, phi) = %f\n", B(i, k, phi));
+            // printf("dB(i, k, phi) = %f\n", dB(i, k, phi));
+
             point.V += B(i, k, phi) * controls[i];
             point.T += dB(i, k, phi) * controls[i];
         }
+        // printf("get point done\n");
         return point;
     }
 
@@ -187,6 +197,9 @@ public:
 
     float B(int i, int n, float t) {
         // compute Bi(t)
+        // printf("C: ");
+        // printf("%d, %d, %f\n", i, n, t);
+        // printf("%f %f, %f", C[n][i], pow(t, i), pow(1 - t, n - i) );
         return C[n][i] * pow(t, i) * pow(1 - t, n - i);
     }
 
