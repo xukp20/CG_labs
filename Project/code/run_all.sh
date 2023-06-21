@@ -9,8 +9,8 @@ fi
 cmake -B build
 cmake --build build
 
-ROUNDS=100
-MAX_DEPTH=5
+ROUNDS=200
+MAX_DEPTH=10
 STEP=10
 
 # Run all testcases. 

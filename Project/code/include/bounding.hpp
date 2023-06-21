@@ -17,7 +17,7 @@ public:
     Vector3f max;
 
     // intersect slab
-    bool intersect(const Ray &r, float tmin, float tmax=FLT_MAX) const {
+    bool intersect(const Ray &r, float &tmin, float tmax=FLT_MAX) const {
         for (int i = 0; i < 3; i++) {
             float invD = 1.0f / r.getDirection()[i];
             float f0 = (min[i] - r.getOrigin()[i]) * invD;
@@ -31,6 +31,7 @@ public:
                 return false;
             }
         }
+        // intersect, set tmin to be the distance
         return true;
     }
 
@@ -42,6 +43,12 @@ public:
             fmax(box0.max.y(), box1.max.y()),
             fmax(box0.max.z(), box1.max.z()));
         return AABB(small, big);
+    }
+
+    bool inside(Vector3f p) const {
+        return p.x() >= min.x() && p.x() <= max.x() &&
+            p.y() >= min.y() && p.y() <= max.y() &&
+            p.z() >= min.z() && p.z() <= max.z();
     }
 };
 
