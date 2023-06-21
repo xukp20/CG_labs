@@ -9,7 +9,7 @@ PerspectiveCamera {
 }
 
 Background {
-    color 0.1 0.2 0.7
+    color 0 0 0
 }
 
 Materials {
@@ -18,7 +18,7 @@ Materials {
 	  color 1 1 1
 	  specularColor 1 1 1
 	  shininess 20
-      type 0 0 1
+      type 0 0.2 1
       refr 2
 	}
     Material { 

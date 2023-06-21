@@ -39,6 +39,22 @@ public:
         return isIntersect;
     }
 
+    bool bounding_box(double _time0, double _time1, AABB &output_box) override {
+        if (group_size < 1) return false;
+        AABB temp_box;
+        bool first_true = objects[0]->bounding_box(_time0, _time1, temp_box);
+        if (!first_true) return false;
+        else output_box = temp_box;
+        for (int i = 1; i < group_size; i++) {
+            if (objects[i]->bounding_box(_time0, _time1, temp_box)) {
+                output_box = AABB::surrounding_box(output_box, temp_box);
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+
     void addObject(int index, Object3D *obj) {
         objects[index] = obj;
     }

@@ -47,6 +47,19 @@ public:
 		}
 	}
 
+	bool bounding_box(double time0, double time1, AABB& output_box) override {
+		Vector3f min = vertices[0];
+		Vector3f max = vertices[0];
+		for (int i = 1; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				min[j] = std::min(min[j], vertices[i][j]);
+				max[j] = std::max(max[j], vertices[i][j]);
+			}
+		}
+		output_box = AABB(min, max);
+		return true;
+	}
+
 	// new tool function, to compute the det of three vectors
 	float det(const Vector3f& a, const Vector3f& b, const Vector3f& c) {
 		// det equals to the dot product of a and the cross product of b and c -> mixed product

@@ -37,6 +37,37 @@ public:
         return inter;
     }
 
+    virtual bool bounding_box(double time0, double time1, AABB &output_box) {
+        if (o->bounding_box(time0, time1, output_box)) {
+            Vector3f min = output_box.min;
+            Vector3f max = output_box.max;
+            Vector3f p[8] = {
+                Vector3f(min.x(), min.y(), min.z()),
+                Vector3f(min.x(), min.y(), max.z()),
+                Vector3f(min.x(), max.y(), min.z()),
+                Vector3f(min.x(), max.y(), max.z()),
+                Vector3f(max.x(), min.y(), min.z()),
+                Vector3f(max.x(), min.y(), max.z()),
+                Vector3f(max.x(), max.y(), min.z()),
+                Vector3f(max.x(), max.y(), max.z())
+            };
+            for (int i = 0; i < 8; i++) {
+                p[i] = transformPoint(transform, p[i]);
+            }
+            Vector3f newMin = p[0];
+            Vector3f newMax = p[0];
+            for(int j = 1; j < 8; j++) {
+                for (int k = 0; k < 3; k++) {
+                    newMin[k] = std::min(newMin[k], p[j][k]);
+                    newMax[k] = std::max(newMax[k], p[j][k]);
+                } 
+            }
+            output_box = AABB(newMin, newMax);
+            return true;
+        }
+        return false;
+    }
+
 protected:
     Object3D *o; //un-transformed object
     Matrix4f transform;

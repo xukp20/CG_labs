@@ -3,10 +3,11 @@
 
 #include <cassert>
 #include <vecmath.h>
+#include <iostream>
 
 #include "ray.hpp"
 #include "hit.hpp"
-#include <iostream>
+#include "texture.hpp"
 
 inline float rand_thres() {
     // 0 ~ 1
@@ -33,13 +34,36 @@ public:
     explicit Material(const Vector3f &d_color, const Vector3f &s_color = Vector3f::ZERO, float s = 0,
                       const Vector3f &l_color = Vector3f::ZERO,
                       const float &n = 1.0f,
-                      const Vector3f &ratio = Vector3f::ZERO
+                      const Vector3f &ratio = Vector3f::ZERO,
+                      const char* texturePath = nullptr
                       ) :
             diffuseColor(d_color), specularColor(s_color), shininess(s),
             selfColor(l_color), 
             n(n),
             ratio(ratio)
             {
+                std::string textureStr = texturePath;
+                if (texturePath != nullptr) {
+                    // if "checkerboard_<color1>_<color2>" <color1> = <>&<>&<>
+                    if (textureStr.find("checkerboard") != std::string::npos) {
+                        std::string color1 = textureStr.substr(textureStr.find("_") + 1, textureStr.rfind("_") - textureStr.find("_") - 1);
+                        std::string color2 = textureStr.substr(textureStr.rfind("_") + 1);
+                        Vector3f c1 = Vector3f::ZERO;
+                        Vector3f c2 = Vector3f::ZERO;
+                        sscanf(color1.c_str(), "%f&%f&%f", &c1.x(), &c1.y(), &c1.z());
+                        sscanf(color2.c_str(), "%f&%f&%f", &c2.x(), &c2.y(), &c2.z());
+
+                        texture = new CheckerBoardTexture(c1, c2);
+
+                    // if "perlin_<bool>"
+                    } else if (textureStr.find("perlin") != std::string::npos) {
+                        std::string boolStr = textureStr.substr(textureStr.find("_") + 1);
+                        bool isColor = boolStr == "color";
+                        texture = new NoiseTexture(isColor);
+                    } else {
+                        texture = new Texture(texturePath);
+                    }
+                }
             }
 
     virtual ~Material() = default;
@@ -71,6 +95,7 @@ public:
     float n;                // for refraction index
     float shininess;
     MeterialRatio ratio;         // for ratio of diffuse / specular / self emission
+    Texture *texture;
 
     // utils
     static Vector3f reflect(const Vector3f &I, const Vector3f &N) {
@@ -125,12 +150,12 @@ public:
             // return true;
 
 
-            // float R0 = pow((1 - n) / (1 + n), 2);
+            float R0 = pow((1 - n) / (1 + n), 2);
             double refraction_ratio = front ? (1.0 / n) : n;
 
             Vector3f unit_direction = ray.getDirection().normalized();
             Vector3f norm = front ? hit.getNormal() : -hit.getNormal();
-            float cos_theta = fmin(Vector3f::dot(-unit_direction, hit.getNormal()), 1.0);
+            float cos_theta = Vector3f::dot(-unit_direction, norm);
             float cos2 = 1 - refraction_ratio * refraction_ratio * (1 - cos_theta * cos_theta);
             bool full_reflection = cos2 < 0;
             Vector3f direction;
@@ -138,28 +163,22 @@ public:
             if (full_reflection) {
                 direction = reflect(unit_direction, norm);
             } else {
-                // float R = R0 + (1 - R0) * pow(1 - cos_theta, 5);
-                // if (rand_thres() < R) {
-                    // direction = reflect(unit_direction, norm);
-                // } else {
+                float R = R0 + (1 - R0) * pow(1 - cos_theta, 5);
+                if (rand_thres() < R) {
+                    direction = reflect(unit_direction, norm);
+                } else {
                     // printf("refract\n");
+                    // printf("cos_theta: %f\n", cos_theta);
+                    // printf("cos2: %f\n", sqrt(cos2));
+                    // printf("refraction_ratio: %f\n", refraction_ratio);
+                    // if (front) {
+                    //     printf("front\n");
+                    // } else {
+                    //     printf("back\n");
+                    // }
                     // Vector3f r_out_prep = refraction_ratio * (unit_direction + cos_theta * hit.getNormal());
                     direction = (refraction_ratio * (unit_direction + cos_theta * norm) - sqrt(cos2) * norm).normalized();
-                // }
-
-                // printf("refract\n");
-                // printf("t: %f\n", hit.getT());
-                // printf("normal: %f %f %f\n", hit.getNormal().x(), hit.getNormal().y(), hit.getNormal().z());
-                // printf("old direction: %f %f %f\n", unit_direction.x(), unit_direction.y(), unit_direction.z());
-                // printf("new direction: %f %f %f\n", direction.x(), direction.y(), direction.z());
-                // printf("front: %d\n", front);
-                // if(front) {
-                //     printf("go in\n");
-                // } else {
-                //     printf("go out\n");
-                // }
-                // printf("old cos: %f\n", cos_theta);
-                // printf("new cos: %f\n", Vector3f::dot(-direction, hit.getNormal()));
+                }
             }
 
             scattered = Ray(ray.pointAtParameter(hit.getT()), direction, ray.time);

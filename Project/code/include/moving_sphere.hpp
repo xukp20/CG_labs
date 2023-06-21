@@ -17,8 +17,7 @@ public:
         const Vector3f &center2, double t0, double t1) : Sphere(center, radius, material) {
         this->center2 = center2;
         this->t0 = t0;
-        this->t1 = t1;
-        
+        this->t1 = t1;  
     }
 
     ~MovingSphere() override = default;
@@ -72,6 +71,15 @@ public:
             }
         }
         return false;
+    }
+
+    bool bounding_box(double time0, double time1, AABB &output_box) override {
+        AABB box0(center(time0) - Vector3f(_radius, _radius, _radius),
+            center(time0) + Vector3f(_radius, _radius, _radius));
+        AABB box1(center(time1) - Vector3f(_radius, _radius, _radius),
+            center(time1) + Vector3f(_radius, _radius, _radius));
+        output_box = AABB::surrounding_box(box0, box1);
+        return true;
     }
 
 protected:

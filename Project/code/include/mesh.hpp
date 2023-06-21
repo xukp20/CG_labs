@@ -26,7 +26,7 @@ public:
     std::vector<TriangleIndex> t;
     std::vector<Vector3f> n;
     bool intersect(const Ray &r, Hit &h, float tmin) override;
-
+    bool bounding_box(double time0, double time1, AABB &output_box) { return false;}
 private:
 
     // Normal can be used for light estimation

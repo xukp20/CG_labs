@@ -68,6 +68,13 @@ public:
         return false;
     }
 
+    bool bounding_box(double _time0, double _time1, AABB &output_box) override {
+        // bounding box of a sphere
+        output_box = AABB(_center - Vector3f(_radius, _radius, _radius),
+                          _center + Vector3f(_radius, _radius, _radius));
+        return true;
+    }
+
 protected:
     Vector3f _center;
     float _radius;

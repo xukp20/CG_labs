@@ -41,12 +41,9 @@ public:
     
     double time;    // for motion blur
 
-private:
-
+public:
     Vector3f origin;
     Vector3f direction;
-
-
 };
 
 inline std::ostream &operator<<(std::ostream &os, const Ray &r) {
