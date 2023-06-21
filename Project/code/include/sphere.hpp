@@ -49,7 +49,10 @@ public:
             // if t_hc^2 = 0, for D = R, there is one intersection
             float t = t_ca;
             if (t >= tmin && t <= h.getT()) {
-                h.set(t, material, (r.pointAtParameter(t) - _center) / _radius);
+                float u, v;
+                Vector3f n = (r.pointAtParameter(t) - _center) / _radius;
+                get_uv(n, u, v);
+                h.set(t, material, n, u, v);
                 return true;
             }
         } else {
@@ -58,10 +61,17 @@ public:
             float t1 = t_ca - t_hc;
             float t2 = t_ca + t_hc;
             if (t1 >= tmin && t1 <= h.getT()) {
-                h.set(t1, material, (r.pointAtParameter(t1) - _center) / _radius);
+                float u, v;
+                Vector3f n = (r.pointAtParameter(t1) - _center) / _radius;
+                get_uv(n, u, v);
+                h.set(t1, material, n, u, v);
                 return true;
             } else if (t2 >= tmin && t2 <= h.getT()) {
-                h.set(t2, material, (r.pointAtParameter(t2) - _center) / _radius);
+                float u, v;
+                Vector3f n = (r.pointAtParameter(t2) - _center) / _radius;
+                get_uv(n, u, v);
+                h.set(t2, material, n, u, v);
+                // h.set(t2, material, (r.pointAtParameter(t2) - _center) / _radius);
                 return true;
             }
         }
@@ -73,6 +83,15 @@ public:
         output_box = AABB(_center - Vector3f(_radius, _radius, _radius),
                           _center + Vector3f(_radius, _radius, _radius));
         return true;
+    }
+
+    void get_uv(const Vector3f &n, float &u, float &v) {
+        // https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/barycentric-coordinates
+        float phi = atan2(n.z(), n.x());
+        float theta = asin(n.y());
+
+        u = 1 - (phi + M_PI) / (2 * M_PI);
+        v = (theta + M_PI / 2) / M_PI;
     }
 
 protected:

@@ -15,16 +15,20 @@ public:
         t = 1e38;
     }
 
-    Hit(float _t, Material *m, const Vector3f &n) {
+    Hit(float _t, Material *m, const Vector3f &n, double _u = 0, double _v = 0) {
         t = _t;
         material = m;
         normal = n;
+        u = _u;
+        v = _v;
     }
 
     Hit(const Hit &h) {
         t = h.t;
         material = h.material;
         normal = h.normal;
+        u = h.u;
+        v = h.v;
     }
 
     // destructor
@@ -42,16 +46,28 @@ public:
         return normal;
     }
 
-    void set(float _t, Material *m, const Vector3f &n) {
+    double getU() const {
+        return u;
+    }
+
+    double getV() const {
+        return v;
+    }
+
+    void set(float _t, Material *m, const Vector3f &n, double _u = 0, double _v = 0) {
         t = _t;
         material = m;
         normal = n;
+        u = _u;
+        v = _v;
     }
 
 private:
     float t;
     Material *material;
     Vector3f normal;
+
+    double u, v; // texture coordinates
 
 };
 

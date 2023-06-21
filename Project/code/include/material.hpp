@@ -43,26 +43,28 @@ public:
             ratio(ratio)
             {
                 std::string textureStr = texturePath;
-                if (texturePath != nullptr) {
-                    // if "checkerboard_<color1>_<color2>" <color1> = <>&<>&<>
+                if (!textureStr.empty()) {
+                    // if "checkerboard_<color1>_<color2>_<ratio>" <color1> = <>&<>&<>
                     if (textureStr.find("checkerboard") != std::string::npos) {
-                        std::string color1 = textureStr.substr(textureStr.find("_") + 1, textureStr.rfind("_") - textureStr.find("_") - 1);
-                        std::string color2 = textureStr.substr(textureStr.rfind("_") + 1);
                         Vector3f c1 = Vector3f::ZERO;
                         Vector3f c2 = Vector3f::ZERO;
-                        sscanf(color1.c_str(), "%f&%f&%f", &c1.x(), &c1.y(), &c1.z());
-                        sscanf(color2.c_str(), "%f&%f&%f", &c2.x(), &c2.y(), &c2.z());
+                        float ratio = 0;
+                        sscanf(textureStr.c_str(), "checkerboard_%f&%f&%f_%f&%f&%f_%f", &c1.x(), &c1.y(), &c1.z(), &c2.x(), &c2.y(), &c2.z(), &ratio);
+                        texture = new CheckerBoardTexture(c1, c2, ratio);
 
-                        texture = new CheckerBoardTexture(c1, c2);
-
-                    // if "perlin_<bool>"
+                    // if "perlin_<bool>_<ratio>"
                     } else if (textureStr.find("perlin") != std::string::npos) {
-                        std::string boolStr = textureStr.substr(textureStr.find("_") + 1);
+                        std::string boolStr = textureStr.substr(textureStr.find("_") + 1, textureStr.find("_", textureStr.find("_") + 1) - textureStr.find("_") - 1);
                         bool isColor = boolStr == "color";
-                        texture = new NoiseTexture(isColor);
+                        float ratio = 0;
+                        std::string ratioStr = textureStr.substr(textureStr.rfind("_") + 1);
+                        sscanf(ratioStr.c_str(), "%f", &ratio);
+                        texture = new NoiseTexture(isColor, ratio);
                     } else {
-                        texture = new Texture(texturePath);
+                        texture = new ImageTexture(textureStr);
                     }
+                } else {
+                    texture = nullptr;
                 }
             }
 
@@ -114,11 +116,19 @@ public:
         // get a rand threshold to determine the type of scattering
         float rand = rand_thres();
         if (rand < ratio.getDiffuseThres()) {
-            // diffuse
-            // printf("diffuse\n");
             Vector3f target = hit.getNormal() + random_unit_vector();
             scattered = Ray(ray.pointAtParameter(hit.getT()), target.normalized(), ray.time);
             attenuation = diffuseColor;
+
+            // If there is a texture, use the texture color
+            if (texture != nullptr) {
+                // printf("texture\n");
+                // fflush(stdout);
+                Vector3f textureColor = texture->getColor(hit.getU(), hit.getV(), ray.pointAtParameter(hit.getT()));
+                attenuation = attenuation * textureColor;
+                // printf("textureColor: %f %f %f\n", textureColor.x(), textureColor.y(), textureColor.z());
+                // printf("attenuation: %f %f %f\n", attenuation.x(), attenuation.y(), attenuation.z());
+            }
             return true;
         } else if (rand < ratio.getSpecularThres()) {
             // specular

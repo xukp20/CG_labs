@@ -259,6 +259,7 @@ Material *SceneParser::parseMaterial() {
         } else if (strcmp(token, "texture") == 0) {
             // Optional: read in texture and draw it.
             getToken(filename);
+            printf("Texture: %s\n", filename);
         } else if (strcmp(token, "selfColor") == 0 || strcmp(token, "emission") == 0) {
             selfColor = readVector3f();
         } else if (strcmp(token, "refractIndex") == 0 || strcmp(token, "refr") == 0) {
@@ -270,7 +271,7 @@ Material *SceneParser::parseMaterial() {
             break;
         }
     }
-    auto *answer = new Material(diffuseColor, specularColor, shininess, selfColor, refractIndex, ratio);
+    auto *answer = new Material(diffuseColor, specularColor, shininess, selfColor, refractIndex, ratio, filename);
     return answer;
 }
 
