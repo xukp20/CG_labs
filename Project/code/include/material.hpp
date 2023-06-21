@@ -8,10 +8,11 @@
 #include "ray.hpp"
 #include "hit.hpp"
 #include "texture.hpp"
+#include "rand.hpp"
 
 inline float rand_thres() {
     // 0 ~ 1
-    return (float)rand() / RAND_MAX;
+    return RAND_UNIFORM;
 }
 
 class MeterialRatio : public Vector3f {

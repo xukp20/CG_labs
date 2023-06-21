@@ -14,6 +14,7 @@
 #include "ray.hpp"
 #include "group.hpp"
 #include "hit.hpp"
+#include "rand.hpp"
 
 
 
@@ -55,12 +56,12 @@ public:
 
     static inline float rand_bias() {
         // -1 ~ 1
-        return 2 * ((float)rand() / RAND_MAX) - 1;
+        return RAND_SIGNED;
     }
 
     static inline float rand_thres() {
         // 0 ~ 1
-        return (float)rand() / RAND_MAX;
+        return RAND_UNIFORM;
     }
 
     void render_image_tile(int start, int end, int id) {

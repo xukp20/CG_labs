@@ -5,16 +5,9 @@
 #include <string>
 
 #include "image.hpp"
-
-
 class Texture {
 public:
     Texture(const std::string &filename) : filename(filename) {
-        // check if not empty
-        if (filename != "") {
-            // load image
-            // TODO
-        }
     }
 
     virtual Vector3f getColor(float u, float v, Vector3f p) = 0;
@@ -150,11 +143,9 @@ public:
 
 class ImageTexture : public Texture {
 public:
-    ImageTexture(const std::string &filename) : Texture(filename) {
-        printf("ImageTexture\n");
-    }
+    ImageTexture(const std::string &filename);
+    Vector3f getColor(float u, float v, Vector3f p) override;
 
-    Vector3f getColor(float u, float v, Vector3f p) override {
-        return Vector3f(1, 1, 1);
-    }
+    unsigned char *pic; 
+    int width, height, nrChannels;
 };

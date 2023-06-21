@@ -56,12 +56,12 @@ public:
 
     static inline float rand_bias() {
         // -1 ~ 1
-        return 2 * ((float)rand() / RAND_MAX) - 1;
+        return RAND_SIGNED;
     }
 
     static inline float rand_thres() {
         // 0 ~ 1
-        return (float)rand() / RAND_MAX;
+        return RAND_UNIFORM;
     }
 
     void render() {
@@ -80,8 +80,8 @@ public:
             for (int i = 0; i < width; i++) {
                 for (int j = 0; j < height; j++) {
                     Vector3f color = image->GetPixel(i, j);
-                    // Ray ray = camera->generateBlurRay(Vector2f(i + rand_bias(), j + rand_bias()));
-                    Ray ray = camera->generateRay(Vector2f(i + rand_bias(), j + rand_bias()));
+                    Ray ray = camera->generateBlurRay(Vector2f(i + rand_bias(), j + rand_bias()));
+                    // Ray ray = camera->generateRay(Vector2f(i + rand_bias(), j + rand_bias()));
                     color += traceRay(ray, 0);  // init with color of black
                     image->SetPixel(i, j, color);
                 }

@@ -125,8 +125,24 @@ void SceneParser::parsePerspectiveCamera() {
     assert (!strcmp(token, "height"));
     int height = readInt();
     getToken(token);
+    float focalLength = 20, apertureSize = 0.2, time0 = 0, time1 = 1;
+    if (!strcmp(token, "focalLength")) {
+        focalLength = readFloat();
+        getToken(token);
+        assert (!strcmp(token, "aperture"));
+        apertureSize = readFloat();
+        getToken(token);
+    }
+    if (!strcmp(token, "time0")) {
+        time0 = readFloat();
+        getToken(token);
+        assert (!strcmp(token, "time1"));
+        time1 = readFloat();
+        getToken(token);
+    }
     assert (!strcmp(token, "}"));
-    camera = new PerspectiveCamera(center, direction, up, width, height, angle_radians);
+    camera = new PerspectiveCamera(center, direction, up, width, height, angle_radians, focalLength, apertureSize,
+                                   time0, time1);
 }
 
 void SceneParser::parseBackground() {
@@ -259,7 +275,6 @@ Material *SceneParser::parseMaterial() {
         } else if (strcmp(token, "texture") == 0) {
             // Optional: read in texture and draw it.
             getToken(filename);
-            printf("Texture: %s\n", filename);
         } else if (strcmp(token, "selfColor") == 0 || strcmp(token, "emission") == 0) {
             selfColor = readVector3f();
         } else if (strcmp(token, "refractIndex") == 0 || strcmp(token, "refr") == 0) {

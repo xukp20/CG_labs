@@ -8,12 +8,13 @@
 #include "ray.hpp"
 #include "group.hpp"
 #include "object3d.hpp"
+#include "rand.hpp"
 
 class BVHNode : public Object3D {
 public:
     BVHNode() {}
     BVHNode(std::vector<Object3D*> &objects, int start, int end, double time0, double time1) {
-        int axis = rand() % 3;
+        int axis = int(3 * RAND_UNIFORM);
         if (axis == 0) {
             std::sort(objects.begin() + start, objects.begin() + end, box_x_compare);
         } else if (axis == 1) {

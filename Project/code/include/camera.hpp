@@ -1,10 +1,12 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "ray.hpp"
 #include <vecmath.h>
 #include <float.h>
 #include <cmath>
+
+#include "ray.hpp"
+#include "rand.hpp"
 
 
 class Camera {
@@ -44,20 +46,23 @@ class PerspectiveCamera : public Camera {
 public:
     PerspectiveCamera(const Vector3f &center, const Vector3f &direction,
             const Vector3f &up, int imgW, int imgH, float angle,
-            float f = 20, float aperture = 0.02f,
+            float f = 20, float aperture = 0.0f,
             double time0 = 0.0, double time1 = 1.0
             ) : Camera(center, direction, up, imgW, imgH) {
         // angle is in radian.
-        fx = imgW / (2 * tan(angle / 2));
+        fx = imgH / (2 * tan(angle / 2));
         fy = imgH / (2 * tan(angle / 2));
         cx = imgW / 2;
         cy = imgH / 2;
 
-        lensRadius = aperture / 2;
+        this->aperture = aperture;
         this->f = f;
 
         this->time0 = time0;
         this->time1 = time1;
+
+        printf("fx: %f, fy: %f, cx: %f, cy: %f\n", fx, fy, cx, cy);
+        printf("aperture: %f, f: %f\n", aperture, f);
     }
 
     // don't take focal and aperture into account
@@ -74,16 +79,17 @@ public:
 
     Ray generateBlurRay(const Vector2f &point) {
         // d_rc
-        Vector3f d_rc = Vector3f((point.x() - cx) / fx, (cy - point.y()) / fy, 1).normalized();
+        float cx = (point.x() - this->cx) / fx * f;
+        float cy = (this->cy - point.y()) / fy * f;
+        float dx = RAND_SIGNED * aperture;
+        float dy = RAND_SIGNED * aperture;
 
-        Matrix3f R = Matrix3f(horizontal, -up, direction);
+        Vector3f d_rc = Vector3f(cx - dx, cy - dy, f);
+        Matrix3f R(horizontal, -up, direction);
         // d_rw
-        Vector3f d_rw = R * d_rc;
+        Vector3f d_rw = (R * d_rc).normalized();
 
-        // lens
-        Vector3f lens = lensRadius * Vector3f(rand_thres() - 0.5, rand_thres() - 0.5, 0);
-
-        return Ray(center + lens, d_rw - lens, time0 + rand_thres() * (time1 - time0));
+        return Ray(center + horizontal * dx - up * dy, d_rw, time0 + rand_thres() * (time1 - time0));
     }
 
 private:
@@ -91,14 +97,14 @@ private:
     float fy;
     float cx, cy;
 
-    float lensRadius;
+    float aperture;
     float f;
 
     double time0, time1; // for motion blur
 
     float rand_thres() {
         // 0 ~ 1
-        return (float)rand() / RAND_MAX;
+        return RAND_UNIFORM;
     }
 };
 

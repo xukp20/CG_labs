@@ -9,9 +9,9 @@ fi
 cmake -B build
 cmake --build build
 
-ROUNDS=200
-MAX_DEPTH=20
-STEP=20
+ROUNDS=100
+MAX_DEPTH=5
+STEP=10
 
 # Run all testcases. 
 # You can comment some lines to disable the run of specific examples.
@@ -26,6 +26,7 @@ mkdir -p output
 # build/PT testcases/scene06_bunny_1k_vn.txt output/scene06_vn.bmp
 # build/PT testcases/ball.txt output/ball.bmp $ROUNDS $MAX_DEPTH $STEP
 # build/PT testcases/ball_checker.txt output/ball_checker.bmp $ROUNDS $MAX_DEPTH $STEP
-build/PT testcases/ball_noise.txt output/ball_noise.bmp $ROUNDS $MAX_DEPTH $STEP
+# build/PT testcases/ball_noise.txt output/ball_noise.bmp $ROUNDS $MAX_DEPTH $STEP
 # build/PT testcases/ball_move.txt output/ball_move.bmp $ROUNDS $MAX_DEPTH $STEP
 # build/PA1 testcases/scene07_shine.txt output/scene07.bmp
+build/PT testcases/scene18_dof.txt output/scene18.bmp $ROUNDS $MAX_DEPTH $STEP

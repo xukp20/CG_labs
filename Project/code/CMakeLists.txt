@@ -15,7 +15,9 @@ SET(PROJECT_SOURCES
         src/image.cpp
         src/main.cpp
         src/mesh.cpp
-        src/scene_parser.cpp)
+        src/scene_parser.cpp
+        src/texture.cpp
+        )
 
 SET(PROJECT_INCLUDES
         include/camera.hpp
@@ -39,6 +41,11 @@ SET(PROJECT_INCLUDES
         # include/sppm/hitpoint.hpp
         include/pt.hpp
         include/pt_thread.hpp
+        include/moving_sphere.hpp
+        include/bounding.hpp
+        include/bvh.hpp
+        include/texture.hpp
+        include/stb_image.h
         )
 
 SET(CMAKE_CXX_STANDARD 11)

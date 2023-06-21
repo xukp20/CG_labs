@@ -34,6 +34,10 @@ int main(int argc, char *argv[]) {
 
     cout << "Hello! Computer Graphics!" << endl;
 
+
+    // set seed 
+    srand((unsigned)time(NULL));
+    
     SceneParser sceneParser(inputFile.c_str());
     // Path Tracing
     PathTracing pathTracing(&sceneParser, outputFile, rounds, max_depth, step);
