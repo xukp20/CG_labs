@@ -46,6 +46,7 @@ SET(PROJECT_INCLUDES
         include/bvh.hpp
         include/texture.hpp
         include/stb_image.h
+        include/box.hpp
         )
 
 SET(CMAKE_CXX_STANDARD 11)

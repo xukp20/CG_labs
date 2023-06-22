@@ -48,6 +48,7 @@ public:
 
     bool bounding_box(double _time0, double _time1, AABB &output_box) override {
         // bounding box of a plane
+        printf("Plane does not have bounding box\n");
         return false;
     }
 

@@ -17,6 +17,7 @@
 #include "transform.hpp"
 #include "curve.hpp"
 #include "revsurface.hpp"
+#include "box.hpp"
 
 #define DegreesToRadians(x) ((M_PI * x) / 180.0f)
 
@@ -317,6 +318,8 @@ Object3D *SceneParser::parseObject(char token[MAX_PARSER_TOKEN_LENGTH]) {
         answer = (Object3D *) parseBsplineCurve();
     } else if (!strcmp(token, "RevSurface")) {
         answer = (Object3D *) parseRevSurface();
+    } else if (!strcmp(token, "Box")) {
+        answer = (Object3D *) parseBox();
     } else {
         printf("Unknown token in parseObject: '%s'\n", token);
         exit(0);
@@ -602,6 +605,17 @@ RevSurface *SceneParser::parseRevSurface() {
     assert (!strcmp(token, "}"));
     auto *answer = new RevSurface(profile, current_material);
     return answer;
+}
+
+Box* SceneParser::parseBox() {
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    getToken(token);
+    assert (!strcmp(token, "{"));
+    Vector3f min_corner = readVector3f();
+    Vector3f max_corner = readVector3f();
+    getToken(token);
+    assert (!strcmp(token, "}"));
+    return new Box(min_corner, max_corner, current_material);
 }
 
 

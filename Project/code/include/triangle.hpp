@@ -60,6 +60,10 @@ public:
 		return true;
 	}
 
+	bool finite() override {
+		return true;
+	}
+
 	// new tool function, to compute the det of three vectors
 	float det(const Vector3f& a, const Vector3f& b, const Vector3f& c) {
 		// det equals to the dot product of a and the cross product of b and c -> mixed product

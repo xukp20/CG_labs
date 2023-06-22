@@ -20,7 +20,7 @@ public:
     // Intersect Ray with this object. If hit, store information in hit structure.
     virtual bool intersect(const Ray &r, Hit &h, float tmin) = 0;
     virtual bool bounding_box(double time0, double time1, AABB &output_box) = 0;
-
+    virtual bool finite() { return false; }
 protected:
 
     Material *material;

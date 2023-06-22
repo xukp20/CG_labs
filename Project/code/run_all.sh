@@ -9,7 +9,7 @@ fi
 cmake -B build
 cmake --build build
 
-ROUNDS=40
+ROUNDS=20
 MAX_DEPTH=10
 STEP=2
 
@@ -31,4 +31,6 @@ mkdir -p output
 # build/PA1 testcases/scene07_shine.txt output/scene07.bmp
 # build/PT testcases/scene18_dof.txt output/scene18.bmp $ROUNDS $MAX_DEPTH $STEP
 # build/PT testcases/curve_bezier.txt output/bezier.bmp $ROUNDS $MAX_DEPTH $STEP
-build/PT testcases/scene09_norm.txt output/scene09_norm.bmp $ROUNDS $MAX_DEPTH $STEP
+# build/PT testcases/scene09_norm.txt output/scene09_norm.bmp $ROUNDS $MAX_DEPTH $STEP
+# build/PT testcases/balls.txt output/balls.bmp $ROUNDS $MAX_DEPTH $STEP
+build/PT testcases/box.txt output/box.bmp $ROUNDS $MAX_DEPTH $STEP

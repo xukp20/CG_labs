@@ -24,6 +24,7 @@ public:
     bool intersect(const Ray &r, Hit &h, float tmin) override {
         // 2023/3/26
         // ray origin to sphere center
+        // printf("sphere tmin: %f\n", tmin);
         Vector3f oc = _center - r.getOrigin();
         // distance between ray origin and sphere center
         float oc_squared_len = oc.squaredLength();
@@ -51,6 +52,7 @@ public:
                 Vector3f n = (r.pointAtParameter(t) - _center) / _radius;
                 get_uv(n, u, v);
                 h.set(t, material, n, u, v);
+                // printf("t: %f\n", t);
                 return true;
             }
         } else {
@@ -63,12 +65,14 @@ public:
                 Vector3f n = (r.pointAtParameter(t1) - _center) / _radius;
                 get_uv(n, u, v);
                 h.set(t1, material, n, u, v);
+                // printf("t1: %f\n", t1);
                 return true;
             } else if (t2 >= tmin && t2 <= h.getT()) {
                 float u, v;
                 Vector3f n = (r.pointAtParameter(t2) - _center) / _radius;
                 get_uv(n, u, v);
                 h.set(t2, material, n, u, v);
+                // printf("t2: %f\n", t2);
                 // h.set(t2, material, (r.pointAtParameter(t2) - _center) / _radius);
                 return true;
             }
@@ -82,6 +86,8 @@ public:
                           _center + Vector3f(_radius, _radius, _radius));
         return true;
     }
+
+    bool finite() override { return true; }
 
     void get_uv(const Vector3f &n, float &u, float &v) {
         // https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/barycentric-coordinates

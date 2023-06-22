@@ -14,6 +14,8 @@ class BVHNode : public Object3D {
 public:
     BVHNode() {}
     BVHNode(std::vector<Object3D*> &objects, int start, int end, double time0, double time1) {
+        // printf("Build BVH: %d %d", start, end);
+        
         int axis = int(3 * RAND_UNIFORM);
         if (axis == 0) {
             std::sort(objects.begin() + start, objects.begin() + end, box_x_compare);
@@ -39,12 +41,19 @@ public:
             std::cerr << "No bounding box in BVHNode constructor.\n";
         }
         box = AABB::surrounding_box(box_left, box_right);
+
+        // printf("Build BVH: %d %d\n", start, end);
+        // printf("box: (%f, %f, %f) (%f, %f, %f)\n", box.min.x(), box.min.y(), box.min.z(), box.max.x(), box.max.y(), box.max.z());
+        // printf("box_left: (%f, %f, %f) (%f, %f, %f)\n", box_left.min.x(), box_left.min.y(), box_left.min.z(), box_left.max.x(), box_left.max.y(), box_left.max.z());
+        // printf("box_right: (%f, %f, %f) (%f, %f, %f)\n", box_right.min.x(), box_right.min.y(), box_right.min.z(), box_right.max.x(), box_right.max.y(), box_right.max.z());
     }
 
     bool intersect(const Ray &r, Hit &h, float tmin) override {
-        if (!box.intersect(r, tmin, FLT_MAX)) return false;
+        float t_min = tmin;
+        if (!box.intersect(r, t_min)) return false;
         bool hit_left = left->intersect(r, h, tmin);
         bool hit_right = right->intersect(r, h, tmin);
+        // printf("hit_left: %d, hit_right: %d\n", hit_left, hit_right);
         return hit_left || hit_right;
     }
 

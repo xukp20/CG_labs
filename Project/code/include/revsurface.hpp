@@ -42,6 +42,8 @@ public:
         return true;
     }
 
+    bool finite() override { return true; }
+
     bool set_bounding_box()  {
         if (box == nullptr) {
             // printf("set bounding box\n");

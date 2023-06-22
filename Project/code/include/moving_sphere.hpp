@@ -82,9 +82,11 @@ public:
         return true;
     }
 
+    double t0, t1;
+
+    bool finite() override { return true; }
 protected:
     Vector3f center2;
-    double t0, t1;
 };
 
 

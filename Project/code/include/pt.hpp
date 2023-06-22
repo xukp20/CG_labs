@@ -68,49 +68,31 @@ public:
         // timer
         clock_t start, end;
         start = time(NULL);
-        for (int k = 0; k < rounds; k++) {
-            float ratio = (float)(k + 0.0001) / (rounds);
+
+#pragma omp parallel for schedule(dynamic, 1)
+        for (int i = 0; i < width; i++) {
+            if (i == 0) {
+                int num = omp_get_num_threads();
+                fprintf(stderr, "Number of threads: %d\n", num);
+            }
+            float ratio = (float)(i + 0.0001) / (width);
             // approximate time
             end = time(NULL);
             float time = (float)(end - start) / 60;
             float time_left = time / ratio - time;
             fprintf(stderr, "\rProgress: %.2f%%, Time: %.2fmin, Time left: %.2fmin", ratio * 100, time, time_left);
             fflush(stderr);
-// #pragma omp parallel for schedule(dynamic, 1)
-            for (int i = 0; i < width; i++) {
-                for (int j = 0; j < height; j++) {
-                    Vector3f color = image->GetPixel(i, j);
-                    Ray ray = camera->generateBlurRay(Vector2f(i + rand_bias(), j + rand_bias()));
-                    // Ray ray = camera->generateRay(Vector2f(i + rand_bias(), j + rand_bias()));
-                    color += traceRay(ray, 0);  // init with color of black
-                    image->SetPixel(i, j, color);
-                }
-            }
-
-            if (k % step == 0 && k != 0) {
-                // save the image
-                Image *new_image = new Image(width, height);
-                for (int i = 0; i < width; i++) {
-                    for (int j = 0; j < height; j++) { 
-                        Vector3f color = image->GetPixel(i, j);
-                        color = color / (k + 1);
-                        new_image->SetPixel(i, j, color);
-                    }
-                }
-                std::string filename = output_file.substr(0, output_file.find_last_of(".")) + "_" + std::to_string(k) + ".bmp";
-                new_image->SaveBMP(filename.c_str());
-            }
-        }
-        printf("\n");
-
-        // normalize the image
-        for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-                Vector3f color = image->GetPixel(i, j);
+                Vector3f color = Vector3f::ZERO;
+                for (int k = 0; k < rounds; k++) {
+                    Ray ray = camera->generateBlurRay(Vector2f(i + rand_bias(), j + rand_bias()));
+                    color += traceRay(ray, 0);  // init with color of black
+                }
                 color = color / rounds;
                 image->SetPixel(i, j, color);
             }
         }
+        printf("\n");
         save();
     }
     
