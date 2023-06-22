@@ -24,7 +24,7 @@ mkdir -p output
 # build/PT testcases/scene05_bunny_200.txt output/scene05.bmp
 # build/PT testcases/scene06_bunny_1k.txt output/scene06.bmp
 # build/PT testcases/scene06_bunny_1k_vn.txt output/scene06_vn.bmp
-# build/PT testcases/ball.txt output/ball.bmp $ROUNDS $MAX_DEPTH $STEP
+build/PT testcases/ball.txt output/ball.bmp $ROUNDS $MAX_DEPTH $STEP
 # build/PT testcases/ball_checker.txt output/ball_checker.bmp $ROUNDS $MAX_DEPTH $STEP
 # build/PT testcases/ball_noise.txt output/ball_noise.bmp $ROUNDS $MAX_DEPTH $STEP
 # build/PT testcases/ball_move.txt output/ball_move.bmp $ROUNDS $MAX_DEPTH $STEP
@@ -33,4 +33,4 @@ mkdir -p output
 # build/PT testcases/curve_bezier.txt output/bezier.bmp $ROUNDS $MAX_DEPTH $STEP
 # build/PT testcases/scene09_norm.txt output/scene09_norm.bmp $ROUNDS $MAX_DEPTH $STEP
 # build/PT testcases/balls.txt output/balls.bmp $ROUNDS $MAX_DEPTH $STEP
-build/PT testcases/box.txt output/box.bmp $ROUNDS $MAX_DEPTH $STEP
+# build/PT testcases/box.txt output/box.bmp $ROUNDS $MAX_DEPTH $STEP

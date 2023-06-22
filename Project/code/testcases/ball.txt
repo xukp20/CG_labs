@@ -18,8 +18,8 @@ Materials {
 	  color 1 1 1
 	  specularColor 1 1 1
 	  shininess 20
-      type 0 0.2 1
-      refr 2
+      type 0 0 1
+      refr 1.5
 	}
     Material { 
         color 0.7 0.7 0.7 
