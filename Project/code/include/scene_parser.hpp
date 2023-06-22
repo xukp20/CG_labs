@@ -18,6 +18,7 @@ class MovingSphere;
 class Curve;
 class RevSurface;
 class Box;
+class Media;
 
 #define MAX_PARSER_TOKEN_LENGTH 1024
 
@@ -81,6 +82,7 @@ private:
     Curve *parseBsplineCurve();
     RevSurface *parseRevSurface();
     Box* parseBox();
+    Media* parseMedia();
 
     int getToken(char token[MAX_PARSER_TOKEN_LENGTH]);
 

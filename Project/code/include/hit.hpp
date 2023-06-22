@@ -62,7 +62,7 @@ public:
         v = _v;
     }
 
-private:
+public:
     float t;
     Material *material;
     Vector3f normal;

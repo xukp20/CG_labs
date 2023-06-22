@@ -17,7 +17,7 @@ public:
     Vector3f max;
 
     // intersect slab
-    bool intersect(const Ray &r, float &tmin) const {
+    bool intersect(const Ray &r, float &t) const {
         Vector3f origin(r.getOrigin());
         Vector3f invdir(1 / r.getDirection().x(), 1 / r.getDirection().y(), 1 / r.getDirection().z());
         std::vector<bool> sign(3);
@@ -48,13 +48,12 @@ public:
         if (tz_max < t_max)
             t_max = tz_max;
 
-        // if (t_min < tmin) {
-        //     tmin = t_min;
-        //     return true;
-        // } else {
-        //     return false;
+        // if (t_min < t) {
+        //     t = t_min;
+        // } else if (t_max < t) {
+        //     t = t_max;
         // }
-        tmin = t_min;
+        t = t_min;
         return true;
     } 
 

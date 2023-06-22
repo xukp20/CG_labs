@@ -23,9 +23,8 @@ Materials {
     numMaterials 8
     Material {
 	  color 1 0.8 1
-	  type 0.8 0.3 0.05
+	  type 0 0.3 0.7
       refr 1.5
-      texture texture/vase.png
 	}
     Material {
         color 0.9 0.9 0.9
@@ -39,7 +38,7 @@ Materials {
     Material {
         color 0.9 0.9 0.9
         type 1 0 0
-        emission 1 1 1
+        emission 2 2 2
     }
     Material {
         color 1 1 1

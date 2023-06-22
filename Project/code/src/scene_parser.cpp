@@ -18,6 +18,7 @@
 #include "curve.hpp"
 #include "revsurface.hpp"
 #include "box.hpp"
+#include "media.hpp"
 
 #define DegreesToRadians(x) ((M_PI * x) / 180.0f)
 
@@ -320,6 +321,8 @@ Object3D *SceneParser::parseObject(char token[MAX_PARSER_TOKEN_LENGTH]) {
         answer = (Object3D *) parseRevSurface();
     } else if (!strcmp(token, "Box")) {
         answer = (Object3D *) parseBox();
+    } else if (!strcmp(token, "Media")) {
+        answer = (Object3D *) parseMedia();
     } else {
         printf("Unknown token in parseObject: '%s'\n", token);
         exit(0);
@@ -618,6 +621,21 @@ Box* SceneParser::parseBox() {
     return new Box(min_corner, max_corner, current_material);
 }
 
+Media* SceneParser::parseMedia() {
+    // printf("Parsing media...\n");
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    getToken(token);
+    assert (!strcmp(token, "{"));
+    getToken(token);
+    assert (!strcmp(token, "Density"));
+    float density = readFloat();
+    Object3D* object = nullptr;
+    getToken(token);
+    object = parseObject(token);
+    getToken(token);
+    assert (!strcmp(token, "}"));
+    return new Media(object, density);
+}
 
 // ====================================================================
 // ====================================================================

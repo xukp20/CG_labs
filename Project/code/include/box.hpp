@@ -25,13 +25,45 @@ public:
     }
 
     bool intersect(const Ray &r, Hit &h, float tmin) override {
-        // use bounding box to check if intersect
-        float t0 = tmin;
-        if (!bounding->intersect(r, t0)) {
+        // get the intersection point
+        Vector3f origin(r.getOrigin());
+        Vector3f invdir(1 / r.getDirection().x(), 1 / r.getDirection().y(), 1 / r.getDirection().z());
+        std::vector<bool> sign(3);
+
+        sign[0] = (invdir.x() < 0);
+        sign[1] = (invdir.y() < 0);
+        sign[2] = (invdir.z() < 0);
+        float t_min = ((sign[0] ? pmax.x() : pmin.x()) - origin.x()) * invdir.x();
+        float t_max = ((sign[0] ? pmin.x() : pmax.x()) - origin.x()) * invdir.x();
+
+        float ty_min = ((sign[1] ? pmax.y() : pmin.y()) - origin.y()) * invdir.y();
+        float ty_max = ((sign[1] ? pmin.y() : pmax.y()) - origin.y()) * invdir.y();
+
+        if ((t_min > ty_max) || (ty_min > t_max))
             return false;
-        }
+        if (ty_min > t_min)
+            t_min = ty_min;
+        if (ty_max < t_max)
+            t_max = ty_max;
+
+        float tz_min = ((sign[2] ? pmax.z() : pmin.z()) - origin.z()) * invdir.z();
+        float tz_max = ((sign[2] ? pmin.z() : pmax.z()) - origin.z()) * invdir.z();
+
+        if ((t_min > tz_max) || (tz_min > t_max))
+            return false;
+        if (tz_min > t_min)
+            t_min = tz_min;
+        if (tz_max < t_max)
+            t_max = tz_max;
+
+        // t_min -> t_max is the range of intersection
+        // get the one larger than tmin
+        float t0 = t_min;
         if (t0 < tmin) {
-            return false;
+            t0 = t_max;
+            if (t0 < tmin) {
+                return false;
+            }
         }
 
         // t0 is the nearest intersection point
@@ -81,6 +113,13 @@ public:
         }
 
         if (t0 < h.getT()) {
+            // printf("Box intersect\n");
+            // printf("t0: %f\n", t0);
+            // if (Vector3f::dot(normal, r.getDirection()) > 0) {
+                // printf("go out\n");
+            // } else {
+                // printf(/"go in\n");
+            // }
             h.set(t0, material, normal);
             return true;
         }
