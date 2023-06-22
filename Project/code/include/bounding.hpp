@@ -17,22 +17,42 @@ public:
     Vector3f max;
 
     // intersect slab
-    bool intersect(const Ray &r, float &tmin, float tmax=FLT_MAX) const {
-        for (int i = 0; i < 3; i++) {
-            float invD = 1.0f / r.getDirection()[i];
-            float f0 = (min[i] - r.getOrigin()[i]) * invD;
-            float f1 = (max[i] - r.getOrigin()[i]) * invD;
-            float t0 = fmin(f0, f1);
-            float t1 = fmax(f0, f1);
+    bool intersect(const Ray &r, float &tmin) const {
+        Vector3f origin(r.getOrigin());
+        Vector3f invdir(1 / r.getDirection().x(), 1 / r.getDirection().y(), 1 / r.getDirection().z());
+        std::vector<bool> sign(3);
+        sign[0] = (invdir.x() < 0);
+        sign[1] = (invdir.y() < 0);
+        sign[2] = (invdir.z() < 0);
+        float t_min = ((sign[0] ? max.x() : min.x()) - origin.x()) * invdir.x();
+        float t_max = ((sign[0] ? min.x() : max.x()) - origin.x()) * invdir.x();
 
-            tmin = fmax(t0, tmin);
-            tmax = fmin(t1, tmax);
-            if (tmax <= tmin) {
-                return false;
-            }
+        float ty_min = ((sign[1] ? max.y() : min.y()) - origin.y()) * invdir.y();
+        float ty_max = ((sign[1] ? min.y() : max.y()) - origin.y()) * invdir.y();
+
+        if ((t_min > ty_max) || (ty_min > t_max))
+            return false;
+        if (ty_min > t_min)
+            t_min = ty_min;
+        if (ty_max < t_max)
+            t_max = ty_max;
+        
+        float tz_min = ((sign[2] ? max.z() : min.z()) - origin.z()) * invdir.z();
+        float tz_max = ((sign[2] ? min.z() : max.z()) - origin.z()) * invdir.z();
+
+        if ((t_min > tz_max) || (tz_min > t_max))
+            return false;
+        if (tz_min > t_min)
+            t_min = tz_min;
+        if (tz_max < t_max)
+            t_max = tz_max;
+
+        if (t_min < tmin) {
+            tmin = t_min;
+            return true;
+        } else {
+            return false;
         }
-        // intersect, set tmin to be the distance
-        return true;
     }
 
     static AABB surrounding_box(AABB box0, AABB box1) {

@@ -29,7 +29,7 @@ Materials {
 	}
     Material {
         color 0.9 0.9 0.9
-        emission 1 1 1
+        emission 4 4 4
         type 1 0 0
     }
     Material {
@@ -43,7 +43,7 @@ Materials {
     }
     Material {
         color 1 1 1
-        emission 1 1 1
+        emission 4 4 4
         type 0 1 0
         refr 1.2
     }

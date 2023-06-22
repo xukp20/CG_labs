@@ -33,7 +33,6 @@ public:
         for (int i = 0; i < group_size; i++) {
             if (objects[i] && objects[i]->intersect(r, h, tmin)) {
                 isIntersect = true;
-                // printf("intersect with %d\n", i);
             }
         }
         return isIntersect;

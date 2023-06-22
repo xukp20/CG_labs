@@ -121,12 +121,15 @@ public:
         Vector3f cf = Vector3f(1.0, 1.0, 1.0);
         Hit hit;
         
+        // bool trace = false;
         while(true) {
             if (++depth > max_depth || cf.x() < 1e-3 || cf.y() < 1e-3 || cf.z() < 1e-3) {
                 break;
             }
             hit = Hit();
             if (group->intersect(ray, hit, 0.001)) {
+                // printf("hit at point: %f %f %f\n", ray.pointAtParameter(hit.getT()).x(), ray.pointAtParameter(hit.getT()).y(), ray.pointAtParameter(hit.getT()).z());
+                // printf("T = %f\n", hit.getT());
                 // hit
                 // move the ray
                 Ray scattered(Vector3f::ZERO, Vector3f::ZERO);
@@ -137,6 +140,7 @@ public:
                 if (hit.getMaterial()->scatter(ray, hit, attenuation, scattered, front)) {
                     color += cf * hit.getMaterial()->selfColor;
                     ray = scattered;
+                    // printf("Attenuation: %f %f %f\n", attenuation.x(), attenuation.y(), attenuation.z());
                     cf = cf * attenuation;
                 } else {
                     break;
@@ -147,6 +151,9 @@ public:
                 break;
             }
         }
+        // if (trace) {
+        //     printf("final color: %f %f %f\n", color.x(), color.y(), color.z());
+        // }
         return color;
 
         // if (depth > max_depth) {
