@@ -14,7 +14,7 @@
 class Group : public Object3D {
 
 public:
-    bool use_bvh = true;
+    bool use_bvh = false;
     std::vector<Object3D*> finite_objects;
     std::vector<Object3D*> infinite_objects;
 

@@ -6,6 +6,8 @@ PerspectiveCamera {
     angle 30
     width 1600
     height 900
+    focalLength 10
+    aperture 0.3
 }
 
 Background {
@@ -47,7 +49,6 @@ Materials {
     Material {
         color 1 1 1
         type 1 0 0
-        texture texture/brick1.jpg
     }
     Material {
         specularColor 1 1 1 

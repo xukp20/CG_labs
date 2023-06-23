@@ -18,8 +18,9 @@ Materials {
 	  color 1 1 1
 	  specularColor 1 1 1
 	  shininess 20
-      type 0 0.2 1
+      type 1 0 0
       refr 2
+      texture texture/brick.jpg
 	}
     Material { 
         color 0.7 0.7 0.7 
@@ -47,7 +48,6 @@ Materials {
     Material {
         color 1 1 1
         type 1 0 0
-        texture texture/brick1.jpg
     }
     Material {
         specularColor 1 1 1 
@@ -76,9 +76,18 @@ Materials {
 Group {
     numObjects 17
     MaterialIndex 0
-    Sphere {
-        center 0.2 0.5 1
-        radius 0.5
+    Transform {
+        Scale 0.3 0.3 0.3
+        Translate 0 0.5 0
+        RevSurface {
+            profile BezierCurve {
+                controls
+                    [ -1.2 3 0 ]
+                    [ 0 0 0 ]
+                    [ -4 0 0 ]
+                    [ -1.3 -2 0 ]
+            }
+        }
     }
     MaterialIndex 1
     Plane {
@@ -142,9 +151,12 @@ Group {
         radius 0.2
     }
     MaterialIndex 10
-    Sphere {
+    MovingSphere {
         center 1.5 0.3 1.2 
         radius 0.2
+        center2 1.5 0.5 1.2
+        t0 0
+        t1 1
     }
     Sphere {
         center 1.6 1.0 0.4
@@ -152,7 +164,7 @@ Group {
     }
     MaterialIndex 11
     Media {
-        Density 1
+        Density 2
         Transform {
             Translate 1.5 1.2 1.2
             YRotate 45
