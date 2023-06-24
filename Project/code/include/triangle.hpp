@@ -20,10 +20,19 @@ public:
 		vertices[2] = c;
 		normal = Vector3f::cross(b - a, c - a);
 		normal.normalize();
+		has_normal = false;
+	}
+
+	void setNormals(const Vector3f& na, const Vector3f& nb, const Vector3f& nc) {
+		normals[0] = na;
+		normals[1] = nb;
+		normals[2] = nc;
+		has_normal = true;
 	}
 
 	bool intersect( const Ray& ray,  Hit& hit , float tmin) override {
         // 2023/3/26
+		// printf("triangle intersect\n");
 		Vector3f e1 = vertices[0] - vertices[1];
 		Vector3f e2 = vertices[0] - vertices[2];
 		Vector3f s = vertices[0] - ray.getOrigin();
@@ -40,9 +49,23 @@ public:
 		if (result[0] < tmin || result[0] > hit.getT() || result[1] < 0 || result[2] < 0 || result[1] + result[2] > 1) {
 			return false;
 		} else {
-			// the direction is opposite to the ray direction?
-			// Vector3f n = Vector3f::dot(normal, ray.getDirection()) < 0 ? normal : -normal;
-			hit.set(result[0], material, normal);
+			// if normal interpolation is needed
+			if (has_normal) {
+				// use the gravity center of the tiangle to interpolate, area weighted
+				Vector3f pos = ray.pointAtParameter(result[0]);
+				Vector3f to0 = vertices[0] - pos;
+				Vector3f to1 = vertices[1] - pos;
+				Vector3f to2 = vertices[2] - pos;
+				float a0 = Vector3f::cross(to1, to2).length();
+				float a1 = Vector3f::cross(to2, to0).length();
+				float a2 = Vector3f::cross(to0, to1).length();
+				float sum = a0 + a1 + a2;
+				Vector3f n = (a0 * normals[0] + a1 * normals[1] + a2 * normals[2]) / sum;
+				n.normalize();
+				hit.set(result[0], material, n);
+			} else {
+				hit.set(result[0], material, normal);
+			}
 			return true;
 		}
 	}
@@ -72,6 +95,10 @@ public:
 
 	Vector3f normal;
 	Vector3f vertices[3];
+
+	// add norm interpolation
+	Vector3f normals[3];
+	bool has_normal;
 protected:
 
 };

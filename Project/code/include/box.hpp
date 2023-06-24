@@ -108,7 +108,7 @@ public:
                 normal = Vector3f(0, 0, -1);
             }
         } else {
-            std::cout << "Box intersect error" << std::endl;
+            // std::cout << "Box intersect error" << std::endl;
             return false;
         }
 
@@ -123,6 +123,7 @@ public:
             h.set(t0, material, normal);
             return true;
         }
+        return false;
     }
 
     bool bounding_box(double t0, double t1, AABB &box) override {

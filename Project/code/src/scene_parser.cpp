@@ -259,7 +259,12 @@ void SceneParser::parseMaterials() {
 Material *SceneParser::parseMaterial() {
     char token[MAX_PARSER_TOKEN_LENGTH];
     char filename[MAX_PARSER_TOKEN_LENGTH];
+    char bump_filename[MAX_PARSER_TOKEN_LENGTH];
+    char normal_filename[MAX_PARSER_TOKEN_LENGTH];
     filename[0] = 0;
+    bump_filename[0] = 0;
+    normal_filename[0] = 0;
+    float bump_ratio = 1;
     Vector3f diffuseColor(1, 1, 1), specularColor(0, 0, 0);
     float shininess = 0;
     Vector3f selfColor(0, 0, 0);
@@ -279,6 +284,12 @@ Material *SceneParser::parseMaterial() {
         } else if (strcmp(token, "texture") == 0) {
             // Optional: read in texture and draw it.
             getToken(filename);
+        } else if (strcmp(token, "bump") == 0) {
+            getToken(bump_filename);
+        } else if (strcmp(token, "bumpRatio") == 0) {
+            bump_ratio = readFloat();
+        } else if (strcmp(token, "normalMap") == 0) {
+            getToken(normal_filename);
         } else if (strcmp(token, "selfColor") == 0 || strcmp(token, "emission") == 0) {
             selfColor = readVector3f();
         } else if (strcmp(token, "refractIndex") == 0 || strcmp(token, "refr") == 0) {
@@ -290,7 +301,7 @@ Material *SceneParser::parseMaterial() {
             break;
         }
     }
-    auto *answer = new Material(diffuseColor, specularColor, shininess, selfColor, refractIndex, ratio, filename);
+    auto *answer = new Material(diffuseColor, specularColor, shininess, selfColor, refractIndex, ratio, filename, bump_filename, bump_ratio, normal_filename);
     return answer;
 }
 
@@ -460,6 +471,7 @@ Triangle *SceneParser::parseTriangle() {
 Mesh *SceneParser::parseTriangleMesh() {
     char token[MAX_PARSER_TOKEN_LENGTH];
     char filename[MAX_PARSER_TOKEN_LENGTH];
+    bool use_inter = false;
     // get the filename
     getToken(token);
     assert (!strcmp(token, "{"));
@@ -467,10 +479,14 @@ Mesh *SceneParser::parseTriangleMesh() {
     assert (!strcmp(token, "obj_file"));
     getToken(filename);
     getToken(token);
+    if (strcmp(token, "use_inter") == 0) {
+        use_inter = true;
+        getToken(token);
+    }
     assert (!strcmp(token, "}"));
     const char *ext = &filename[strlen(filename) - 4];
     assert(!strcmp(ext, ".obj"));
-    Mesh *answer = new Mesh(filename, current_material);
+    Mesh *answer = new Mesh(filename, current_material, use_inter);
 
     return answer;
 }

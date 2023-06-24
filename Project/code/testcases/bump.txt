@@ -18,8 +18,11 @@ Materials {
 	  color 1 1 1
 	  specularColor 1 1 1
 	  shininess 20
-      type 0 0.2 0.8
+      type 1 0 0
       refr 2
+      texture texture/wood.jpg
+      normalMap bump/wood_normal.png
+      bumpRatio 0.75
 	}
     Material { 
         color 0.7 0.7 0.7 
@@ -49,10 +52,11 @@ Group {
     numObjects 10
     MaterialIndex 0
     Transform {
-		Scale  5 5 5 
-		Translate  0.03 -0.0666 0 	
-        TriangleMesh {
-            obj_file mesh/bunny_1k_vn.obj
+        YRotate -90
+        Translate 0 0.5 0
+        Sphere {
+            center 0 0 0
+            radius 0.5
         }
     }
     MaterialIndex 1

@@ -149,3 +149,24 @@ public:
     unsigned char *pic; 
     int width, height, nrChannels;
 };
+
+// bump 
+// read from a bump image
+class BumpTexture : public ImageTexture {
+    // to get the height information
+public:
+    const float BUMP_FACTOR = 4;
+    BumpTexture(const std::string &filename) : ImageTexture(filename) {}
+    float getHeight(float u, float v, Vector3f p) {
+        // use the color of the image as the height
+        float color = getColor(u, v, p).length();
+        return color * BUMP_FACTOR;
+    }
+};
+
+class NormalTexture : public ImageTexture {
+    // to get the normal information
+public:
+    NormalTexture(const std::string &filename) : ImageTexture(filename) {}
+    // nothing to add, the image file contains the normal information
+};

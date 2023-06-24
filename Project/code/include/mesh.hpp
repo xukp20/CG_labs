@@ -13,7 +13,7 @@
 class Mesh : public Object3D {
 
 public:
-    Mesh(const char *filename, Material *m);
+    Mesh(const char *filename, Material *m, bool use_inter=false);
 
     struct TriangleIndex {
         TriangleIndex() {
@@ -25,8 +25,11 @@ public:
     };
 
     std::vector<Vector3f> v;
+    std::vector<Vector3f> vn;
     std::vector<TriangleIndex> t;
     std::vector<Vector3f> n;
+    bool use_inter;
+
     bool intersect(const Ray &r, Hit &h, float tmin) override;
     bool bounding_box(double time0, double time1, AABB &output_box) { 
         // the bounding box is outside the all triangles

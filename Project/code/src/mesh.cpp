@@ -6,21 +6,33 @@
 #include <utility>
 #include <sstream>
 
-bool Mesh::intersect(const Ray &r, Hit &h, float tmin) {
 
+bool Mesh::intersect(const Ray &r, Hit &h, float tmin) {
+    // printf("mesh intersect\n");
     // Optional: Change this brute force method into a faster one.
     bool result = false;
     for (int triId = 0; triId < (int) t.size(); ++triId) {
         TriangleIndex& triIndex = t[triId];
+        // Triangle triangle(v[triIndex[0]],
+        //                   v[triIndex[1]], v[triIndex[2]], material);
+        // triangle.normal = n[triId];
         Triangle triangle(v[triIndex[0]],
-                          v[triIndex[1]], v[triIndex[2]], material);
-        triangle.normal = n[triId];
+            v[triIndex[1]], v[triIndex[2]], material);
+        if (!use_inter) {
+            triangle.normal = n[triId];
+        } else {
+            // printf("set normal\n");
+            // printf("triIndex[0] = %d\n", triIndex[0]);
+            triangle.setNormals(vn[triIndex[0]],
+                vn[triIndex[1]], vn[triIndex[2]]);
+            // printf("set normal\n");
+        }
         result |= triangle.intersect(r, h, tmin);
     }
     return result;
 }
 
-Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
+Mesh::Mesh(const char *filename, Material *material, bool use_inter) : Object3D(material) {
 
     // Optional: Use tiny obj loader to replace this simple one.
     std::ifstream f;
@@ -33,6 +45,11 @@ Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
     std::string vTok("v");
     std::string fTok("f");
     std::string texTok("vt");
+
+    this->use_inter = use_inter;
+
+    // add normal
+    std::string vnTok("vn");
     char bslash = '/', space = ' ';
     std::string tok;
     int texID;
@@ -76,9 +93,17 @@ Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
             Vector2f texcoord;
             ss >> texcoord[0];
             ss >> texcoord[1];
+        } else if (tok == vnTok) {
+            Vector3f normal;
+            ss >> normal[0];
+            ss >> normal[1];
+            ss >> normal[2];
+            vn.push_back(normal);
         }
     }
-    computeNormal();
+    if (!use_inter) {
+        computeNormal();
+    }
 
     f.close();
 }

@@ -8,7 +8,11 @@ ImageTexture::ImageTexture(const std::string &filename) : Texture(filename) {
             return;
         }
         pic = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
-        printf("ImageTexture: %s, width: %d, height: %d, nrChannels: %d\n", filename.c_str(), width, height, nrChannels);
+        if (pic == nullptr) {
+            printf("ImageTexture: failed to load image\n");
+            exit(1);
+        }
+        printf("Image: %s, width: %d, height: %d, nrChannels: %d\n", filename.c_str(), width, height, nrChannels);
     }
 
 Vector3f ImageTexture::getColor(float u, float v, Vector3f p) {
@@ -55,6 +59,7 @@ Vector3f ImageTexture::getColor(float u, float v, Vector3f p) {
     c1 += Vector3f(pic[idx1], pic[idx1 + 1], pic[idx1 + 2]);
     c1 = c1 / 255.0;
 
+    // printf("i: %d, j: %d, c1: %f %f %f\n", i, j, c1.x(), c1.y(), c1.z());
     return c1;
 }
 

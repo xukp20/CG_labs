@@ -122,7 +122,6 @@ public:
                 if (hit.getMaterial()->scatter(ray, hit, attenuation, scattered, front)) {
                     color += cf * hit.getMaterial()->selfColor;
                     ray = scattered;
-                    // printf("Attenuation: %f %f %f\n", attenuation.x(), attenuation.y(), attenuation.z());
                     cf = cf * attenuation;
                 } else {
                     break;
@@ -133,37 +132,8 @@ public:
                 break;
             }
         }
-        // if (trace) {
-        //     printf("final color: %f %f %f\n", color.x(), color.y(), color.z());
-        // }
+
         return color;
-
-        // if (depth > max_depth) {
-        //     return Vector3f::ZERO;
-        // }
-
-        // if (group->intersect(ray, hit, 0.001)) {
-        //     // hit
-        //     // move the ray
-        //     Ray scattered(Vector3f::ZERO, Vector3f::ZERO);
-        //     Vector3f attenuation;
-        //     // check if entering the object
-        //     // note: the normal is always pointing outwards
-        //     bool front = Vector3f::dot(ray.getDirection(), hit.getNormal()) < 0;
-        //     // printf("T: %f\n", hit.getT());
-        //     // printf("hit point: (%f, %f, %f)\n", ray.pointAtParameter(hit.getT()).x(), ray.pointAtParameter(hit.getT()).y(), ray.pointAtParameter(hit.getT()).z());
-        //     if (hit.getMaterial()->scatter(ray, hit, attenuation, scattered, front)) {
-        //         // printf("attenuation: (%f, %f, %f)\n", attenuation.x(), attenuation.y(), attenuation.z());
-        //         // printf("selfColor: (%f, %f, %f)\n", hit.getMaterial()->selfColor.x(), hit.getMaterial()->selfColor.y(), hit.getMaterial()->selfColor.z());
-
-        //         return hit.getMaterial()->selfColor + attenuation * traceRay(scattered, depth + 1);
-        //     } else {
-        //         return Vector3f::ZERO;
-        //     }
-        // } else {
-        //     // no hit
-        //     return scene->getBackgroundColor();
-        // }
     }
 
     // utils

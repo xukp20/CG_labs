@@ -36,36 +36,73 @@ public:
                       const Vector3f &l_color = Vector3f::ZERO,
                       const float &n = 1.0f,
                       const Vector3f &ratio = Vector3f::ZERO,
-                      const char* texturePath = nullptr
+                      const char* texturePath = nullptr,
+                      const char* bumpPath = nullptr,
+                      const float bumpRatio = 1,
+                      const char* normalPath = nullptr    
                       ) :
             diffuseColor(d_color), specularColor(s_color), shininess(s),
             selfColor(l_color), 
             n(n),
-            ratio(ratio)
+            ratio(ratio),
+            bumpRatio(bumpRatio)
             {
-                std::string textureStr = texturePath;
-                if (!textureStr.empty()) {
-                    // if "checkerboard_<color1>_<color2>_<ratio>" <color1> = <>&<>&<>
-                    if (textureStr.find("checkerboard") != std::string::npos) {
-                        Vector3f c1 = Vector3f::ZERO;
-                        Vector3f c2 = Vector3f::ZERO;
-                        float ratio = 0;
-                        sscanf(textureStr.c_str(), "checkerboard_%f&%f&%f_%f&%f&%f_%f", &c1.x(), &c1.y(), &c1.z(), &c2.x(), &c2.y(), &c2.z(), &ratio);
-                        texture = new CheckerBoardTexture(c1, c2, ratio);
+                // set texture
+                if (texturePath) {
+                    std::string textureStr = texturePath;
+                    if (!textureStr.empty()) {
+                        // if "checkerboard_<color1>_<color2>_<ratio>" <color1> = <>&<>&<>
+                        if (textureStr.find("checkerboard") != std::string::npos) {
+                            Vector3f c1 = Vector3f::ZERO;
+                            Vector3f c2 = Vector3f::ZERO;
+                            float ratio = 0;
+                            sscanf(textureStr.c_str(), "checkerboard_%f&%f&%f_%f&%f&%f_%f", &c1.x(), &c1.y(), &c1.z(), &c2.x(), &c2.y(), &c2.z(), &ratio);
+                            texture = new CheckerBoardTexture(c1, c2, ratio);
 
-                    // if "perlin_<bool>_<ratio>"
-                    } else if (textureStr.find("perlin") != std::string::npos) {
-                        std::string boolStr = textureStr.substr(textureStr.find("_") + 1, textureStr.find("_", textureStr.find("_") + 1) - textureStr.find("_") - 1);
-                        bool isColor = boolStr == "color";
-                        float ratio = 0;
-                        std::string ratioStr = textureStr.substr(textureStr.rfind("_") + 1);
-                        sscanf(ratioStr.c_str(), "%f", &ratio);
-                        texture = new NoiseTexture(isColor, ratio);
+                        // if "perlin_<bool>_<ratio>"
+                        } else if (textureStr.find("perlin") != std::string::npos) {
+                            std::string boolStr = textureStr.substr(textureStr.find("_") + 1, textureStr.find("_", textureStr.find("_") + 1) - textureStr.find("_") - 1);
+                            bool isColor = boolStr == "color";
+                            float ratio = 0;
+                            std::string ratioStr = textureStr.substr(textureStr.rfind("_") + 1);
+                            sscanf(ratioStr.c_str(), "%f", &ratio);
+                            texture = new NoiseTexture(isColor, ratio);
+                        } else {
+                            printf("Image Texture: %s\n", textureStr.c_str());
+                            texture = new ImageTexture(textureStr);
+                        }
                     } else {
-                        texture = new ImageTexture(textureStr);
+                        texture = nullptr;
                     }
                 } else {
                     texture = nullptr;
+                }
+                
+
+                // set bump
+                if (bumpPath) {
+                    std::string bumpStr = bumpPath;
+                    if (!bumpStr.empty()) {
+                        printf("Bump Texture: %s\n", bumpStr.c_str());
+                        bump = new BumpTexture(bumpStr);
+                    } else {
+                        bump = nullptr;
+                    }
+                } else {
+                    bump = nullptr;
+                }
+
+                // set normal
+                if (normalPath) {
+                    std::string normalStr = normalPath;
+                    if (!normalStr.empty()) {
+                        printf("Normal Texture: %s\n", normalStr.c_str());
+                        normal = new NormalTexture(normalStr);
+                    } else {
+                        normal = nullptr;
+                    }
+                } else {
+                    normal = nullptr;
                 }
             }
 
@@ -98,7 +135,10 @@ public:
     float n;                // for refraction index
     float shininess;
     MeterialRatio ratio;         // for ratio of diffuse / specular / self emission
+    float bumpRatio;        // for bump ratio
     Texture *texture;
+    BumpTexture* bump;          // bump is also stored as a texture
+    NormalTexture* normal;      // normal is also stored as a texture
 
     // utils
     static Vector3f reflect(const Vector3f &I, const Vector3f &N) {
@@ -113,27 +153,47 @@ public:
         }
     }
 
-    bool scatter(const Ray &ray, const Hit &hit, Vector3f &attenuation, Ray &scattered, bool front=true) {
+    bool scatter(const Ray &ray, Hit &hit, Vector3f &attenuation, Ray &scattered, bool front=true) {
+        Vector3f textureColor = Vector3f::ZERO;
+        // get the texture before bump and normal
+        if (texture != nullptr) {
+            textureColor = texture->getColor(hit.getU(), hit.getV(), ray.pointAtParameter(hit.getT()));
+        }
+
+        // if there is a normal texture, use the normal texture to modify the normal
+        if (normal != nullptr) {
+            Vector3f relative_norm = normal->getColor(hit.getU(), hit.getV(), ray.pointAtParameter(hit.getT())).normalized();
+            // Ratate the relative_norm to the world space with n of hit
+            // build the ratation matrix: from (0,0,1) to hit.getNormal()
+            Vector3f axis = Vector3f::cross(Vector3f(0, 0, 1), hit.getNormal()).normalized();
+            float angle = acos(Vector3f::dot(Vector3f(0, 0, 1), hit.getNormal()));
+            Matrix3f rotation = Matrix3f::rotation(axis, angle);
+            Vector3f norm = rotation * relative_norm;
+            hit.normal = norm;
+        }
+
         // get a rand threshold to determine the type of scattering
         float rand = rand_thres();
         if (rand < ratio.getDiffuseThres()) {
             Vector3f target = hit.getNormal() + random_unit_vector();
-            scattered = Ray(ray.pointAtParameter(hit.getT()), target.normalized(), ray.time);
+
+            Vector3f p = ray.pointAtParameter(hit.getT());
+
+            if (bump != nullptr) {
+                float height = bump->getHeight(hit.getU(), hit.getV(), p);
+                // printf("height: %f\n", height);
+                p += front ? bumpRatio * height * hit.getNormal() : -bumpRatio * height * hit.getNormal();
+            }
+            scattered = Ray(p, target.normalized(), ray.time);
             attenuation = diffuseColor;
 
             // If there is a texture, use the texture color
             if (texture != nullptr) {
-                // printf("texture\n");
-                // fflush(stdout);
-                Vector3f textureColor = texture->getColor(hit.getU(), hit.getV(), ray.pointAtParameter(hit.getT()));
                 attenuation = attenuation * textureColor;
-                // printf("textureColor: %f %f %f\n", textureColor.x(), textureColor.y(), textureColor.z());
-                // printf("attenuation: %f %f %f\n", attenuation.x(), attenuation.y(), attenuation.z());
             }
             return true;
         } else if (rand < ratio.getSpecularThres()) {
             // specular
-            // printf("specular\n");
             Vector3f reflected = reflect(ray.getDirection().normalized(), hit.getNormal()).normalized();
             scattered = Ray(ray.pointAtParameter(hit.getT()), reflected, ray.time);
             attenuation = specularColor;
