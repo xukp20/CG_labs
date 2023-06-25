@@ -109,7 +109,7 @@ Materials {
 }
 
 Group {
-    numObjects 21
+    numObjects 20
     MaterialIndex 0
     Transform {
         Translate 0.2 0.7 0.2
@@ -217,7 +217,7 @@ Group {
     MaterialIndex 12
     Transform {
         Scale 0.15 0.15 0.15
-        Translate 6 2 6
+        Translate 6 2 8
         RevSurface {
             profile BezierCurve {
                 controls
@@ -237,20 +237,11 @@ Group {
 
     MaterialIndex 14
     Transform {
-		Scale  2 2 2
-		Translate  0 0 0
+        Scale  5 5 5 
+		Translate  -0.19 -0.0466 0
         TriangleMesh {
             obj_file mesh/bunny_1k_vn.obj
             use_inter
-        }
-    }
-
-    MaterialIndex 15
-    Transform {
-        Scale  1 1 1 
-		Translate  0 0 0
-        TriangleMesh {
-            obj_file mesh/bunny_1k_vn.obj
         }
     }
 }

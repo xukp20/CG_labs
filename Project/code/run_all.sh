@@ -9,8 +9,8 @@ fi
 cmake -B build
 cmake --build build
 
-ROUNDS=20
-MAX_DEPTH=10
+ROUNDS=5
+MAX_DEPTH=5
 STEP=2
 
 # Run all testcases. 
@@ -42,4 +42,4 @@ mkdir -p output
 # build/PT testcases/6.txt output/6_1.bmp $ROUNDS $MAX_DEPTH $STEP
 # build/PT testcases/9.txt output/9_1.bmp $ROUNDS $MAX_DEPTH $STEP
 # build/PT testcases/10.txt output/10_1.bmp $ROUNDS $MAX_DEPTH $STEP
-build/PT testcases/bump.txt output/bump.bmp $ROUNDS $MAX_DEPTH $STEP
+build/PT testcases/final.txt output/final.bmp $ROUNDS $MAX_DEPTH $STEP
