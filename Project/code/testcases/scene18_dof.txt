@@ -47,7 +47,7 @@ Materials {
     Material {
         color 1 1 1
         type 1 0 0
-        texture texture/china.png
+        texture texture/brick1.jpg
     }
     Material {
         color 1 1 1

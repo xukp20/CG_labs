@@ -40,13 +40,14 @@ SET(PROJECT_INCLUDES
         # include/sppm/kdtree.hpp
         # include/sppm/hitpoint.hpp
         include/pt.hpp
-        include/pt_thread.hpp
+        # include/pt_thread.hpp
         include/moving_sphere.hpp
         include/bounding.hpp
         include/bvh.hpp
         include/texture.hpp
         include/stb_image.h
         include/box.hpp
+        include/rand.hpp
         )
 
 SET(CMAKE_CXX_STANDARD 11)
